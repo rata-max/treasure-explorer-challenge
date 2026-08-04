@@ -1,0 +1,9 @@
+[project]
+name = "treasure-explorer-week1"
+version = "0.1.0"
+requires-python = ">=3.11"
+description = "Week 1 starter for the Treasure Explorer Bot Challenge"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
