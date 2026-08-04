@@ -1,8 +1,8 @@
 // Edit this file and click "Commit changes". GitHub Pages updates automatically.
 window.SITE_CONTENT = {
   semester: "Problem Solving Techniques · Fall 2026",
-  badge: "WEEK 01 · 6-HOUR LAB",
-  title: "Explore.",
+  badge: "WEEK 01~ · 6-HOUR LAB",
+  title: "Treasure Explorer.",
   subtitle: "Collect. Return.",
   description: "Plan under partial information. Collect valuable treasure and reach the exit before energy runs out.",
   labHours: "6H", initialEnergy: "100", submission: "student/agent.py",
@@ -20,12 +20,11 @@ window.SITE_CONTENT = {
     {number:"RULE 03",title:"Budget energy",text:"Normal: 1 · Mud: 4 · Water: 5 · Collect: 1"}
   ],
   schedule: [
-    ["00:00","Inspect","Run the engine and inspect Observation."],
-    ["00:40","Route","Build and recover a path with BFS."],
-    ["02:10","Weight","Upgrade to Dijkstra for terrain costs."],
-    ["03:10","State","Track unknown, known, and collected treasure."],
-    ["04:20","Safety","Check the energy needed to return."],
-    ["05:20","Test","Run public maps and review failures."]
+    ["1week","Route","Build and recover a path with BFS."],
+    ["1week","Weight","Upgrade to Dijkstra for terrain costs."],
+    ["2week","State","Track unknown, known, and collected treasure."],
+    ["2week","Safety","Check the energy needed to return."],
+    ["3week","Test","Run public maps and review failures."]
   ],
   rubric: [
     ["20","Safe finish","Reach the exit on every public map"],
