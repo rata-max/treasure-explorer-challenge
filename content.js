@@ -32,37 +32,50 @@ window.SITE_CONTENT = {
     ["20","Pathfinding","BFS/Dijkstra and path recovery"],
     ["15","Replanning","Use the latest observation"],
     ["10","Energy check","Verify a safe return"],
-    ["25","Performance","Hidden score and code quality"],
+    ["25","Performance","Assigned-map score and code quality"],
     ["10","Design note","Complexity and failure analysis"]
   ],
   weeks: [
     {
       number: "01", title: "VALUE-AWARE TREASURE HUNTER",
       tagline: "Evaluate treasures, manage energy, and replan online.",
-      focus: "Online reward-cost decision making",
+      focus: "Guided practice · Provided maps",
       objectives: ["Score each treasure using reward, travel cost, and return cost.", "Replan when value or terrain is revealed.", "Reach the exit on every public map."],
-      deliverables: ["student/agent.py", "One-page design note", "Public-map result table"]
+      deliverables: ["student/agent.py", "One-page design note", "Results on the assigned maps"],
+      evaluation: {
+        label: "PRACTICE EVALUATION",
+        title: "Solve the provided value-aware planning tasks.",
+        text: "Week 1 is evaluated only with the maps and requirements released for this assignment. There is no unseen hidden-map evaluation."
+      }
     },
     {
       number: "02", title: "RISK-AWARE ONLINE PLANNER",
       tagline: "Balance expected reward against uncertain travel costs.",
-      focus: "Planning under uncertainty",
+      focus: "Intermediate practice · Provided scenarios",
       objectives: ["Model expected and worst-case terrain costs.", "Adjust risk using remaining energy.", "Choose and abandon multi-treasure plans online."],
-      deliverables: ["student/agent.py", "Risk model description", "Week 1 comparison"]
+      deliverables: ["student/agent.py", "Risk model description", "Week 1 comparison"],
+      evaluation: {
+        label: "PRACTICE EVALUATION",
+        title: "Solve the provided risk-aware planning tasks.",
+        text: "Week 2 is evaluated with the released scenarios and stated requirements. Use the feedback to prepare the final agent."
+      }
     },
     {
       number: "03", title: "ROBUST EXPLORER CHAMPIONSHIP",
       tagline: "Generalize across unseen maps, costs, and treasure values.",
       focus: "Hidden-map robustness",
       objectives: ["Generalize without map-specific hardcoding.", "Improve average score, exit rate, and worst-case behavior.", "Keep every decision within the runtime limit."],
-      deliverables: ["Final student/agent.py", "Two-page final report", "Failure and ablation analysis"]
+      deliverables: ["Final student/agent.py", "Two-page final report", "Failure and ablation analysis"],
+      evaluation: {
+        label: "FINAL EVALUATION",
+        title: "The final agent runs on unseen hidden maps.",
+        text: "Only Week 3 uses unseen hidden maps and seeds. Evaluation considers score, exit rate, robustness, invalid actions, and runtime."
+      }
     }
   ],
   submissionRules: [
     "Modify and submit student/agent.py only.",
     "Do not modify the engine, maps, tests, runner, or configuration files.",
-    "The final agent is evaluated on unseen hidden maps and seeds.",
-    "Public-map scores are for development and do not guarantee the final score.",
     "The agent must not access files, networks, subprocesses, or external packages."
   ],
   integrityRules: [
