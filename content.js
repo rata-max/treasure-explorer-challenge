@@ -12,6 +12,15 @@ window.SITE_CONTENT = {
   command: "python -m treasure_explorer --map maps/example_easy.json --agent student/agent.py",
   scoreFormula: "Σ TREASURE + ENERGY LEFT - 5 × INVALID",
   noExitRule: "EXIT에 도달하지 못하면 SCORE = 0",
+  missionLabel: "01 / THE MISSION",
+  missionTitle: "정답 경로는 처음부터 보이지 않는다.",
+  missionDescription: "이 과제의 핵심은 한 번의 완벽한 계획이 아닙니다. 관측하고, 추정하고, 움직이고, 새 정보로 다시 계획하는 루프를 설계하는 것입니다.",
+  process: [
+    ["01", "OBSERVE", "지도 · 에너지"],
+    ["02", "ESTIMATE", "가치 · 복귀 비용"],
+    ["03", "PLAN", "목표 · 경로"],
+    ["04", "ACT", "한 번의 행동"]
+  ],
   rules: [
     { number: "RULE 01", title: "움직이면 드러난다", text: "진흙과 물은 인접했을 때 공개되고, 보물 가치는 도착한 뒤에야 알 수 있습니다." },
     { number: "RULE 02", title: "가치보다 귀환", text: "보물을 아무리 많이 모아도 출구에 도달하지 못하면 최종 점수는 0점입니다." },
