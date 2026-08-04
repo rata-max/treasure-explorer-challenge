@@ -7,7 +7,7 @@ window.SITE_CONTENT = {
   description: "Plan under partial information. Collect valuable treasure and reach the exit before energy runs out.",
   labHours: "6H", initialEnergy: "100", submission: "student/agent.py",
   pythonVersion: "Python 3.11+",
-  command: "python -m treasure_explorer --map maps/example_easy.json --agent student/agent.py",
+  command: "python -m treasure_explorer --map maps/week1_tree_easy.json --agent student/agent.py --view",
   scoreFormula: "TREASURE + ENERGY LEFT - 5 × INVALID",
   noExitRule: "NO EXIT, NO SCORE",
   missionLabel: "01 / MISSION",
@@ -37,21 +37,23 @@ window.SITE_CONTENT = {
   ],
   weeks: [
     {
-      number: "01", title: "VALUE-AWARE TREASURE HUNTER",
-      tagline: "Evaluate treasures, manage energy, and replan online.",
-      focus: "Guided practice · Provided maps",
-      objectives: ["Score each treasure using reward, travel cost, and return cost.", "Replan when value or terrain is revealed.", "Reach the exit on every public map."],
-      deliverables: ["student/agent.py", "One-page design note", "Results on the assigned maps"],
+      number: "01", title: "KEYED TREE ESCAPE",
+      tagline: "Build a search tree, collect the right items, and reach the exit.",
+      focus: "DFS/BFS parent tree · Provided maps",
+      repositoryUrl: "https://github.com/rata-max/treasure-explorer-challenge/tree/main/treasure-explorer-week1-tree-escape",
+      objectives: ["Build a DFS or BFS parent tree over the maze.", "Recover the unique path to a key, useful batteries, and the exit.", "Manage energy and reach the exit on all three released maps."],
+      deliverables: ["student/agent.py", "Complexity and path-recovery note", "Results on easy, medium, and hard maps"],
       evaluation: {
         label: "PRACTICE EVALUATION",
-        title: "Solve the provided value-aware planning tasks.",
-        text: "Week 1 is evaluated only with the maps and requirements released for this assignment. There is no unseen hidden-map evaluation."
+        title: "Solve the three provided tree-maze tasks.",
+        text: "The easy map needs a key path. The medium and hard maps require battery-aware planning. Week 1 uses no unseen hidden maps."
       }
     },
     {
       number: "02", title: "RISK-AWARE ONLINE PLANNER",
       tagline: "Balance expected reward against uncertain travel costs.",
       focus: "Intermediate practice · Provided scenarios",
+      repositoryUrl: "",
       objectives: ["Model expected and worst-case terrain costs.", "Adjust risk using remaining energy.", "Choose and abandon multi-treasure plans online."],
       deliverables: ["student/agent.py", "Risk model description", "Week 1 comparison"],
       evaluation: {
@@ -64,6 +66,7 @@ window.SITE_CONTENT = {
       number: "03", title: "ROBUST EXPLORER CHAMPIONSHIP",
       tagline: "Generalize across unseen maps, costs, and treasure values.",
       focus: "Hidden-map robustness",
+      repositoryUrl: "",
       objectives: ["Generalize without map-specific hardcoding.", "Improve average score, exit rate, and worst-case behavior.", "Keep every decision within the runtime limit."],
       deliverables: ["Final student/agent.py", "Two-page final report", "Failure and ablation analysis"],
       evaluation: {
