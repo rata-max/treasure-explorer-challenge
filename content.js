@@ -1,7 +1,7 @@
 // Edit this file and click "Commit changes". GitHub Pages updates automatically.
 window.SITE_CONTENT = {
   semester: "Problem Solving Techniques · Fall 2026",
-  badge: "WEEK 01 · 6-HOUR LAB",
+  badge: "6-HOUR LAB",
   title: "Explore.",
   subtitle: "Collect. Return.",
   description: "Plan under partial information. Collect valuable treasure and reach the exit before energy runs out.",
