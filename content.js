@@ -98,3 +98,112 @@ window.SITE_CONTENT.stages = [
 {number:"05",week:"WEEK 3",day:"TUESDAY",title:"FOG AND REPLANNING",unlocked:false,tagline:"Reveal terrain, update state, and plan again.",focus:"Frontiers - Online replanning",repositoryUrl:"dist/week3_tuesday.zip",objectives:["Maintain a partial world model.","Explore useful frontier cells.","Replan after terrain revelation."],deliverables:["agent.py","Replanning trace","Failure analysis"],evaluation:{label:"PRACTICE EVALUATION",title:"Adapt on released fog maps.",text:"The agent receives only its current observation on every turn."}},
 {number:"06",week:"WEEK 3",day:"THURSDAY",title:"HIDDEN FINAL CHALLENGE",unlocked:false,tagline:"Generalize across hidden maps, costs, and values.",focus:"Exploration vs exploitation - Robustness",repositoryUrl:"dist/week3_thursday.zip",objectives:["Generalize without map-name hardcoding.","Balance information gain and safe return.","Improve average score and exit rate."],deliverables:["Final agent.py","Two-page report","Ablation and failure analysis"],evaluation:{label:"FINAL EVALUATION",title:"Run one agent on unseen seeded maps.",text:"Evaluation combines score, exit rate, robustness, invalid actions, and runtime."}}
 ];
+
+window.SITE_CONTENT.stageRules = [
+["The map, exit, treasure locations, and treasure values are fully public.","Every released map is a connected tree with one simple path between reachable cells.","Movement uses unit cost; collecting costs one additional energy.","The agent must reserve enough energy to reach the exit after every detour.","One generic agent.py must handle every map in this stage."],
+["All Week 1 Tuesday rules remain in effect.","Treasure branches may share travel cost and must not be evaluated as independent round trips.","Nearest-first, highest-value-first, and isolated value-to-cost ratio are not guaranteed to be optimal.","All information remains public; the difficulty is global optimization, not uncertainty.","The route must reach the exit or the run scores zero."],
+["The public map is a weighted general graph and may contain cycles.","Terrain cost is charged on entry: normal 1, mud 4, and water 7.","The fewest-step path is not necessarily the lowest-energy path.","Treasure locations and values are public.","One generic agent must solve every released weighted map."],
+["All Week 2 Tuesday rules remain in effect.","The agent must select a feasible treasure subset and its visit order.","Optimize the complete route ending at the exit, not one treasure in isolation.","Exact search, DP, branch-and-bound, beam search, and principled heuristics are allowed.","Every action must be returned within the published runtime limit."],
+["The complete map is not initially visible.","Unobserved cells are shown as ?; unknown does not mean normal or safe.","Only current and previous observations may be used.","Revealed information may be remembered within one run.","Select exploration frontiers and replan when new information changes the route."],
+["All Week 3 Tuesday rules remain in effect.","Terrain, treasure values, the exit, and map structure may be hidden until revealed.","The submitted agent runs unchanged on unseen maps generated from hidden seeds.","Hardcoded coordinates, seed detection, file access, networking, subprocesses, and side channels are prohibited.","Evaluation emphasizes average score, exit rate, invalid actions, runtime, and worst-case robustness.","Balance information gathering against a safe return to the exit."]
+];
+// Edit this file and click "Commit changes". GitHub Pages updates automatically.
+window.SITE_CONTENT = {
+  semester: "Problem Solving Techniques · Fall 2026",
+  badge: "6-HOUR LAB",
+  title: "Explore.",
+  subtitle: "Collect. Return.",
+  description: "Plan under partial information. Collect valuable treasure and reach the exit before energy runs out.",
+  labHours: "6H", initialEnergy: "100", submission: "student/agent.py",
+  pythonVersion: "Python 3.11+",
+  command: "python -m treasure_explorer --map maps/week1_tree_easy.json --agent student/agent.py --view",
+  scoreFormula: "TREASURE + ENERGY LEFT - 5 × INVALID",
+  noExitRule: "NO EXIT, NO SCORE",
+  missionLabel: "01 / MISSION",
+  missionTitle: "The best path is not visible at the start.",
+  missionDescription: "Observe, estimate, plan, act, and replan when new information appears.",
+  process: [["01","OBSERVE","Map · Energy"],["02","ESTIMATE","Value · Return cost"],["03","PLAN","Target · Route"],["04","ACT","One action"]],
+  rules: [
+    {number:"RULE 01",title:"Reveal as you move",text:"Terrain costs appear nearby. Treasure values appear on arrival."},
+    {number:"RULE 02",title:"Return first",text:"Treasure counts only after the bot reaches the exit."},
+    {number:"RULE 03",title:"Budget energy",text:"Normal: 1 · Mud: 4 · Water: 5 · Collect: 1"}
+  ],
+  schedule: [
+    ["00:00","Inspect","Run the engine and inspect Observation."],
+    ["00:40","Route","Build and recover a path with BFS."],
+    ["02:10","Weight","Upgrade to Dijkstra for terrain costs."],
+    ["03:10","State","Track unknown, known, and collected treasure."],
+    ["04:20","Safety","Check the energy needed to return."],
+    ["05:20","Test","Run public maps and review failures."]
+  ],
+  rubric: [
+    ["20","Safe finish","Reach the exit on every public map"],
+    ["20","Pathfinding","BFS/Dijkstra and path recovery"],
+    ["15","Replanning","Use the latest observation"],
+    ["10","Energy check","Verify a safe return"],
+    ["25","Performance","Assigned-map score and code quality"],
+    ["10","Design note","Complexity and failure analysis"]
+  ],
+  weeks: [
+    {
+      number: "01", title: "KEYED TREE ESCAPE",
+      tagline: "Build a search tree, collect the right items, and reach the exit.",
+      focus: "DFS/BFS parent tree · Provided maps",
+      repositoryUrl: "https://github.com/rata-max/treasure-explorer-challenge/tree/main/treasure-explorer-week1-tree-escape",
+      objectives: ["Build a DFS or BFS parent tree over the maze.", "Recover the unique path to a key, useful batteries, and the exit.", "Manage energy and reach the exit on all three released maps."],
+      deliverables: ["student/agent.py", "Complexity and path-recovery note", "Results on easy, medium, and hard maps"],
+      evaluation: {
+        label: "PRACTICE EVALUATION",
+        title: "Solve the three provided tree-maze tasks.",
+        text: "The easy map needs a key path. The medium and hard maps require battery-aware planning. Week 1 uses no unseen hidden maps."
+      }
+    },
+    {
+      number: "02", title: "RISK-AWARE ONLINE PLANNER",
+      tagline: "Balance expected reward against uncertain travel costs.",
+      focus: "Intermediate practice · Provided scenarios",
+      repositoryUrl: "",
+      objectives: ["Model expected and worst-case terrain costs.", "Adjust risk using remaining energy.", "Choose and abandon multi-treasure plans online."],
+      deliverables: ["student/agent.py", "Risk model description", "Week 1 comparison"],
+      evaluation: {
+        label: "PRACTICE EVALUATION",
+        title: "Solve the provided risk-aware planning tasks.",
+        text: "Week 2 is evaluated with the released scenarios and stated requirements. Use the feedback to prepare the final agent."
+      }
+    },
+    {
+      number: "03", title: "ROBUST EXPLORER CHAMPIONSHIP",
+      tagline: "Generalize across unseen maps, costs, and treasure values.",
+      focus: "Hidden-map robustness",
+      repositoryUrl: "",
+      objectives: ["Generalize without map-specific hardcoding.", "Improve average score, exit rate, and worst-case behavior.", "Keep every decision within the runtime limit."],
+      deliverables: ["Final student/agent.py", "Two-page final report", "Failure and ablation analysis"],
+      evaluation: {
+        label: "FINAL EVALUATION",
+        title: "The final agent runs on unseen hidden maps.",
+        text: "Only Week 3 uses unseen hidden maps and seeds. Evaluation considers score, exit rate, robustness, invalid actions, and runtime."
+      }
+    }
+  ],
+  submissionRules: [
+    "Modify and submit student/agent.py only.",
+    "Do not modify the engine, maps, tests, runner, or configuration files.",
+    "The agent must not access files, networks, subprocesses, or external packages."
+  ],
+  integrityRules: [
+    "Do not copy or share another student's agent code.",
+    "Do not publish solution code in a public repository before grading ends.",
+    "Do not identify hidden maps or seeds through hardcoding or side channels.",
+    "Declare external code, references, and permitted AI assistance in the report."
+  ]
+};
+
+/* Six sequential releases. TA: unlock only the next item. Keep unreleased ZIPs off the public branch. */
+window.SITE_CONTENT.stages = [
+{number:"01",week:"WEEK 1",day:"TUESDAY",title:"TREE PLANNING FOUNDATIONS",unlocked:true,tagline:"Public trees, energy feasibility, and reward detours.",focus:"DFS/BFS parent paths - Global planning",repositoryUrl:"dist/week1_tuesday.zip",objectives:["Recover unique paths in a tree.","Compare reward with detour and safe-exit cost.","Use one generic agent across every released map."],deliverables:["agent.py","Complexity note","Results on all public maps"],evaluation:{label:"PRACTICE EVALUATION",title:"Finish safely, then improve reward.",text:"All information is public. A direct exit baseline works, while global planning earns more."}},
+{number:"02",week:"WEEK 1",day:"THURSDAY",title:"GREEDY KILLER TREES",unlocked:false,tagline:"Shared branches defeat local treasure choices.",focus:"Tree DP - Lookahead - Branch selection",repositoryUrl:"dist/week1_thursday.zip",objectives:["Identify nearest/value/ratio greedy failures.","Exploit shared branch travel cost.","Reserve enough energy for the exit."],deliverables:["agent.py","Greedy counterexample note","Score table"],evaluation:{label:"CHALLENGE EVALUATION",title:"Optimize reward on public trees.",text:"Maps are public, but optimal reward requires non-local planning."}},
+{number:"03",week:"WEEK 2",day:"TUESDAY",title:"WEIGHTED GRAPH ROUTES",unlocked:false,tagline:"Terrain costs replace simple hop count.",focus:"Dijkstra - Priority queue",repositoryUrl:"dist/week2_tuesday.zip",objectives:["Compute terrain-aware shortest paths.","Reconstruct weighted routes.","Compare treasure detours by true cost."],deliverables:["agent.py","Dijkstra complexity note","Route-cost tests"],evaluation:{label:"PRACTICE EVALUATION",title:"Solve released weighted maps.",text:"Mud and water are public; BFS by hop count can be expensive."}},
+{number:"04",week:"WEEK 2",day:"THURSDAY",title:"PRIZE-COLLECTING GRAPH",unlocked:false,tagline:"Choose and order treasures on a cyclic graph.",focus:"Multi-target routing - Energy budget",repositoryUrl:"dist/week2_thursday.zip",objectives:["Select a feasible treasure subset.","Optimize visit order.","Trade search quality against runtime."],deliverables:["agent.py","Optimization design note","Ablation table"],evaluation:{label:"CHALLENGE EVALUATION",title:"Maximize score on public general graphs.",text:"All inputs are known; global route optimization is the difficulty."}},
+{number:"05",week:"WEEK 3",day:"TUESDAY",title:"FOG AND REPLANNING",unlocked:false,tagline:"Reveal terrain, update state, and plan again.",focus:"Frontiers - Online replanning",repositoryUrl:"dist/week3_tuesday.zip",objectives:["Maintain a partial world model.","Explore useful frontier cells.","Replan after terrain revelation."],deliverables:["agent.py","Replanning trace","Failure analysis"],evaluation:{label:"PRACTICE EVALUATION",title:"Adapt on released fog maps.",text:"The agent receives only its current observation on every turn."}},
+{number:"06",week:"WEEK 3",day:"THURSDAY",title:"HIDDEN FINAL CHALLENGE",unlocked:false,tagline:"Generalize across hidden maps, costs, and values.",focus:"Exploration vs exploitation - Robustness",repositoryUrl:"dist/week3_thursday.zip",objectives:["Generalize without map-name hardcoding.","Balance information gain and safe return.","Improve average score and exit rate."],deliverables:["Final agent.py","Two-page report","Ablation and failure analysis"],evaluation:{label:"FINAL EVALUATION",title:"Run one agent on unseen seeded maps.",text:"Evaluation combines score, exit rate, robustness, invalid actions, and runtime."}}
+];
