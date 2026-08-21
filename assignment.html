@@ -1,8 +1,76 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Treasure Explorer Assignment</title><link rel="stylesheet" href="globals.css"><script src="content.js?v=week1-maps-20260821"></script></head><body>
-<nav class="nav"><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><a class="navCta" href="index.html#schedule">ALL WEEKS →</a></nav>
-<main class="assignmentPage"><header class="assignmentHero"><div class="assignmentHeroCopy"><p id="weekLabel"></p><h1 id="weekTitle"></h1><p id="weekTagline"></p><div class="focusTag" id="weekFocus"></div></div><a class="repositoryCta" id="repositoryCta" target="_blank" rel="noopener noreferrer">OPEN WEEK 1 REPOSITORY <span>↗</span></a></header>
-<section class="assignmentGrid"><article><p class="sectionCode">OBJECTIVES</p><div id="objectives"></div></article><article><p class="sectionCode">DELIVERABLES</p><div id="deliverables"></div></article></section>
-<section class="contract"><p class="sectionCode">STAGE RULES</p><h2>What changes in this assignment.</h2><div class="contractGrid"><div><h3>Rules for this stage</h3><ul id="stageRules"></ul></div><div><h3>Project-wide contract</h3><ul id="submissionRules"></ul><p><a class="repositoryCta" href="rules.html">READ THE FULL RULEBOOK →</a></p></div></div></section><section class="contract"><p class="sectionCode">ACADEMIC INTEGRITY</p><h2>Build a general solution.</h2><ul id="integrityRules"></ul></section>
-<section class="hiddenEval"><span id="evaluationLabel"></span><h2 id="evaluationTitle"></h2><p id="evaluationText"></p></section>
-</main><footer><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><p>Problem Solving Techniques · Fall 2026</p></footer>
-<script>const c=window.SITE_CONTENT;const n=Math.min(c.stages.length,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));const w=c.stages[n-1];if(!w.unlocked){location.replace('index.html#schedule')};document.title=`Week ${w.number} · ${w.title}`;document.getElementById('weekLabel').textContent=`${w.week} · ${w.day} / ASSIGNMENT`;document.getElementById('weekTitle').textContent=w.title;document.getElementById('weekTagline').textContent=w.tagline;document.getElementById('weekFocus').textContent=w.focus;const repo=document.getElementById('repositoryCta');if(w.repositoryUrl){repo.href=w.repositoryUrl;repo.textContent='DOWNLOAD STARTER →'}else{repo.hidden=true}const list=(id,a)=>document.getElementById(id).innerHTML=a.map(x=>`<div class="numberedItem"><span>✓</span><p>${x}</p></div>`).join('');list('objectives',w.objectives);list('deliverables',w.deliverables);document.getElementById('stageRules').innerHTML=c.stageRules[n-1].map(x=>`<li>${x}</li>`).join('');document.getElementById('submissionRules').innerHTML=c.submissionRules.map(x=>`<li>${x}</li>`).join('');document.getElementById('integrityRules').innerHTML=c.integrityRules.map(x=>`<li>${x}</li>`).join('');document.getElementById('evaluationLabel').textContent=w.evaluation.label;document.getElementById('evaluationTitle').textContent=w.evaluation.title;document.getElementById('evaluationText').textContent=w.evaluation.text;</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Treasure Explorer Assignment</title>
+  <link rel="stylesheet" href="globals.css">
+  <script src="content.js?v=student-guide-20260821"></script>
+</head>
+<body>
+  <nav class="nav">
+    <a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a>
+    <a class="navCta" href="index.html#schedule">ALL WEEKS →</a>
+  </nav>
+  <main class="assignmentPage">
+    <header class="assignmentHero">
+      <div class="assignmentHeroCopy">
+        <p id="weekLabel"></p><h1 id="weekTitle"></h1><p id="weekTagline"></p>
+        <div class="focusTag" id="weekFocus"></div>
+      </div>
+      <a class="repositoryCta" id="repositoryCta">DOWNLOAD STARTER →</a>
+    </header>
+    <section class="assignmentGrid">
+      <article><p class="sectionCode">OBJECTIVES</p><div id="objectives"></div></article>
+      <article><p class="sectionCode">DELIVERABLES</p><div id="deliverables"></div></article>
+    </section>
+    <section class="runGuide">
+      <p class="sectionCode">RUN THE SAME AGENT ON EVERY MAP</p>
+      <h2>Change the map argument, not the agent.</h2>
+      <p>Open the extracted stage folder in VS Code. Run these commands from the folder that directly contains <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.</p>
+      <div class="commandList">
+        <div><strong>ONE MAP WITH VIEWER</strong><code id="stageCommand"></code></div>
+        <div><strong>ALL MAPS · POWERSHELL</strong><code id="powershellCommand"></code></div>
+        <div><strong>ALL MAPS · BASH / MACOS</strong><code id="bashCommand"></code></div>
+        <div><strong>PACKAGE TESTS</strong><code id="testCommand"></code></div>
+      </div>
+      <p><code>--view</code> animates the map. Add <code>--delay 0.4</code> to slow it down or <code>--no-clear</code> to preserve every frame. Each command starts a fresh, independent run.</p>
+    </section>
+    <section class="contract">
+      <p class="sectionCode">STAGE RULES</p><h2>What changes in this assignment.</h2>
+      <div class="contractGrid">
+        <div><h3>Rules for this stage</h3><ul id="stageRules"></ul></div>
+        <div><h3>Project-wide contract</h3><ul id="submissionRules"></ul><p><a class="repositoryCta" href="rules.html">READ THE FULL RULEBOOK →</a></p></div>
+      </div>
+    </section>
+    <section class="contract"><p class="sectionCode">ACADEMIC INTEGRITY</p><h2>Build a general solution.</h2><ul id="integrityRules"></ul></section>
+    <section class="hiddenEval"><span id="evaluationLabel"></span><h2 id="evaluationTitle"></h2><p id="evaluationText"></p></section>
+  </main>
+  <footer><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><p>Problem Solving Techniques · Fall 2026</p></footer>
+  <script>
+    const c=window.SITE_CONTENT;
+    const n=Math.min(c.stages.length,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
+    const w=c.stages[n-1];
+    if(!w.unlocked) location.replace('index.html#schedule');
+    document.title=`${w.week} · ${w.day} · ${w.title}`;
+    document.getElementById('weekLabel').textContent=`${w.week} · ${w.day} / ASSIGNMENT`;
+    document.getElementById('weekTitle').textContent=w.title;
+    document.getElementById('weekTagline').textContent=w.tagline;
+    document.getElementById('weekFocus').textContent=w.focus;
+    const repo=document.getElementById('repositoryCta');
+    if(w.repositoryUrl){repo.href=w.repositoryUrl}else{repo.hidden=true}
+    const list=(id,items)=>document.getElementById(id).innerHTML=items.map(x=>`<div class="numberedItem"><span>✓</span><p>${x}</p></div>`).join('');
+    list('objectives',w.objectives); list('deliverables',w.deliverables);
+    document.getElementById('stageRules').innerHTML=c.stageRules[n-1].map(x=>`<li>${x}</li>`).join('');
+    document.getElementById('submissionRules').innerHTML=c.submissionRules.map(x=>`<li>${x}</li>`).join('');
+    document.getElementById('integrityRules').innerHTML=c.integrityRules.map(x=>`<li>${x}</li>`).join('');
+    document.getElementById('stageCommand').textContent=c.stageCommands[n-1];
+    document.getElementById('powershellCommand').textContent=c.batchCommands.powershell;
+    document.getElementById('bashCommand').textContent=c.batchCommands.bash;
+    document.getElementById('testCommand').textContent=c.batchCommands.tests;
+    document.getElementById('evaluationLabel').textContent=w.evaluation.label;
+    document.getElementById('evaluationTitle').textContent=w.evaluation.title;
+    document.getElementById('evaluationText').textContent=w.evaluation.text;
+  </script>
+</body>
+</html>
