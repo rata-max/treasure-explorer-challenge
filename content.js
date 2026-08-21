@@ -4,20 +4,20 @@ window.SITE_CONTENT = {
   badge: "6-HOUR LAB",
   title: "Explore.",
   subtitle: "Collect. Return.",
-  description: "Plan under partial information. Collect valuable treasure and reach the exit before energy runs out.",
-  labHours: "6H", initialEnergy: "100", submission: "student/agent.py",
+  description: "Build one generic agent per stage. Run it unchanged across every released map, collect profitable treasure, and always preserve a safe route to the exit.",
+  labHours: "6H", initialEnergy: "MAP", submission: "agent.py",
   pythonVersion: "Python 3.11+",
-  command: "python -m treasure_explorer --map maps/week1_tree_easy.json --agent student/agent.py --view",
-  scoreFormula: "TREASURE + ENERGY LEFT - 5 × INVALID",
+  command: "python -m treasure_explorer --map maps/warmup.json --agent agent.py --view",
+  scoreFormula: "50 EXIT BONUS + TREASURE + ENERGY LEFT - 5 × INVALID",
   noExitRule: "NO EXIT, NO SCORE",
   missionLabel: "01 / MISSION",
-  missionTitle: "The best path is not visible at the start.",
-  missionDescription: "Observe, estimate, plan, act, and replan when new information appears.",
+  missionTitle: "One agent. Every map in the stage.",
+  missionDescription: "Read the current Observation, select one valid Action, and repeat. Week 1–2 use public information; Week 3 introduces partial observability.",
   process: [["01","OBSERVE","Map · Energy"],["02","ESTIMATE","Value · Return cost"],["03","PLAN","Target · Route"],["04","ACT","One action"]],
   rules: [
-    {number:"RULE 01",title:"Reveal as you move",text:"Terrain costs appear nearby. Treasure values appear on arrival."},
+    {number:"RULE 01",title:"Information changes by stage",text:"Week 1–2 maps are public. Week 3 reveals only the information included in each Observation."},
     {number:"RULE 02",title:"Return first",text:"Treasure counts only after the bot reaches the exit."},
-    {number:"RULE 03",title:"Budget energy",text:"Normal: 1 · Mud: 4 · Water: 5 · Collect: 1"}
+    {number:"RULE 03",title:"Budget energy",text:"Normal: 1 · Mud: 4 · Water: 7 · Collect: 1"}
   ],
   schedule: [
     ["00:00","Inspect","Run the engine and inspect Observation."],
@@ -77,7 +77,7 @@ window.SITE_CONTENT = {
     }
   ],
   submissionRules: [
-    "Modify and submit student/agent.py only.",
+    "Modify and submit the root-level agent.py from the released stage package.",
     "Do not modify the engine, maps, tests, runner, or configuration files.",
     "The agent must not access files, networks, subprocesses, or external packages."
   ],
@@ -102,8 +102,24 @@ window.SITE_CONTENT.stages = [
 window.SITE_CONTENT.stageRules = [
 ["The package contains four released maps: warmup, two branches, greedy trap, and energy budget.","The map, exit, treasure locations, and treasure values are fully public.","Every released map is a connected tree with one unique simple path between reachable cells.","Every move costs 1 energy, and COLLECT costs 1 additional energy.","Entering the exit ends the run immediately; collected treasure counts only after a successful exit.","The agent must reserve enough energy for the complete route to the exit.","Use --view to animate the map, --delay to control speed, and --no-clear to preserve every frame.","Submit one generic agent.py that runs unchanged on all four maps."],
 ["All Week 1 Tuesday rules and the same Observation/Action API remain in effect.","The package contains five advanced maps: shared branch, value trap, subset order, large tree, and challenge.","Treasure branches may share travel cost and must not be evaluated as independent round trips.","Nearest-first, highest-value-first, and isolated value-to-cost ratio are not guaranteed to be optimal.","The agent must choose a feasible treasure subset and, when relevant, its visit order.","Exact search, tree DP, subset DP, branch-and-bound, and justified heuristics are allowed.","Use --view to animate the map, --delay to control speed, and --no-clear to preserve every frame.","All information remains public; the difficulty is global optimization rather than uncertainty.","The route must reach the exit or the run scores zero, and one generic agent.py must handle all five maps."],
-["The public map is a weighted general graph and may contain cycles.","Terrain cost is charged on entry: normal 1, mud 4, and water 7.","The fewest-step path is not necessarily the lowest-energy path.","Treasure locations and values are public.","One generic agent must solve every released weighted map."],
-["All Week 2 Tuesday rules remain in effect.","The agent must select a feasible treasure subset and its visit order.","Optimize the complete route ending at the exit, not one treasure in isolation.","Exact search, DP, branch-and-bound, beam search, and principled heuristics are allowed.","Every action must be returned within the published runtime limit."],
-["The complete map is not initially visible.","Unobserved cells are shown as ?; unknown does not mean normal or safe.","Only current and previous observations may be used.","Revealed information may be remembered within one run.","Select exploration frontiers and replan when new information changes the route."],
-["All Week 3 Tuesday rules remain in effect.","Terrain, treasure values, the exit, and map structure may be hidden until revealed.","The submitted agent runs unchanged on unseen maps generated from hidden seeds.","Hardcoded coordinates, seed detection, file access, networking, subprocesses, and side channels are prohibited.","Evaluation emphasizes average score, exit rate, invalid actions, runtime, and worst-case robustness.","Balance information gathering against a safe return to the exit."]
+["The released map, exit, treasure locations, and values are public.","Walkable cells form a weighted general graph and may contain cycles.","Terrain cost is charged when a cell is entered: normal/start/exit/treasure 1, mud 4, and water 7.","COLLECT costs 1 additional energy; the fewest-step path may not be the lowest-energy path.","The exit ends the run immediately and may not be used as an intermediate waypoint.","Submit one generic agent.py for every map released with this stage.","This package is not public yet; exact filenames and any limits will be stated in its README at release."],
+["All Week 2 Tuesday action, terrain, scoring, and submission rules remain in effect.","The agent must select a feasible treasure subset and its visit order on a cyclic graph.","Optimize the complete route ending at the exit, not one treasure or one leg in isolation.","Exact search, subset DP, branch-and-bound, beam search, and justified heuristics are allowed.","The same agent.py must run unchanged on every released map; map-name and layout hardcoding are prohibited.","This package is not public yet; exact filenames, map count, and runtime limits will be stated in its README at release."],
+["The map is only partially observable; each decision may use the current Observation and memory accumulated within the same run.","Unobserved cells are shown as ?; unknown does not mean normal, safe, blocked, or passable.","The exit or treasure values may be None until revealed, as specified by the released package.","Revealed information may be remembered during one run, but separate map runs must begin with fresh agent state.","Select exploration frontiers and replan whenever new information changes route cost, feasibility, or value.","Submit one generic agent.py for every released fog map; exact filenames will be stated in the README at release."],
+["All Week 3 Tuesday observation, memory, action, scoring, and submission rules remain in effect.","Terrain, treasure values, exit location, and map structure may remain hidden until observed.","The submitted agent runs unchanged on released practice maps and unseen maps generated from hidden seeds.","Hardcoded coordinates, map fingerprints, seed detection, file access, networking, subprocesses, reflection, and side channels are prohibited.","No state or information may be shared between independent evaluation runs.","Evaluation emphasizes normalized score, exit rate, invalid actions, runtime, and worst-case robustness.","Exact evaluation limits and submission procedure will be published before this stage is unlocked."]
 ];
+
+/* Commands shown on the homepage and assignment pages. */
+window.SITE_CONTENT.stageCommands = [
+  "python -m treasure_explorer --map maps/warmup.json --agent agent.py --view",
+  "python -m treasure_explorer --map maps/shared_branch.json --agent agent.py --view",
+  "python -m treasure_explorer --map maps/<released-map>.json --agent agent.py --view",
+  "python -m treasure_explorer --map maps/<released-map>.json --agent agent.py --view",
+  "python -m treasure_explorer --map maps/<released-map>.json --agent agent.py --view",
+  "python -m treasure_explorer --map maps/<released-map>.json --agent agent.py --view"
+];
+
+window.SITE_CONTENT.batchCommands = {
+  powershell: "Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }",
+  bash: "for map in maps/*.json; do python -m treasure_explorer --map \"$map\" --agent agent.py; done",
+  tests: "python -m unittest discover -s tests -v"
+};
