@@ -1,6 +1,6 @@
 ﻿// Edit this file and click "Commit changes". GitHub Pages updates automatically.
 window.SITE_CONTENT = {
-  semester: "Problem Solving Techniques 쨌 Fall 2026",
+  semester: "Problem Solving Techniques · Fall 2026",
   badge: "6-HOUR LAB",
   title: "Explore.",
   subtitle: "Collect. Return.",
@@ -8,16 +8,16 @@ window.SITE_CONTENT = {
   labHours: "6H", initialEnergy: "MAP", submission: "agent.py",
   pythonVersion: "Python 3.11+",
   command: "python -m treasure_explorer --map maps/warmup.json --agent agent.py --view",
-  scoreFormula: "50 EXIT BONUS + TREASURE + ENERGY LEFT - 5 횞 INVALID",
+  scoreFormula: "50 EXIT BONUS + TREASURE + ENERGY LEFT - 5 INVALID",
   noExitRule: "NO EXIT, NO SCORE",
   missionLabel: "01 / MISSION",
   missionTitle: "One agent. Every map in the stage.",
-  missionDescription: "Read the current Observation, select one valid Action, and repeat. Week 1?? use public information; Week 3 introduces partial observability.",
-  process: [["01","OBSERVE","Map 쨌 Energy"],["02","ESTIMATE","Value 쨌 Return cost"],["03","PLAN","Target 쨌 Route"],["04","ACT","One action"]],
+  missionDescription: "Read the current Observation, select one valid Action, and repeat.",
+  process: [["01","OBSERVE","Map · Energy"],["02","ESTIMATE","Value · Return cost"],["03","PLAN","Target · Route"],["04","ACT","One action"]],
   rules: [
     {number:"RULE 01",title:"Information changes by stage",text:"Week 1?? maps are public. Week 3 reveals only the information included in each Observation."},
     {number:"RULE 02",title:"Return first",text:"Treasure counts only after the bot reaches the exit."},
-    {number:"RULE 03",title:"Budget energy",text:"Normal: 1 쨌 Mud: 4 쨌 Water: 7 쨌 Collect: 1"}
+    {number:"RULE 03",title:"Budget energy",text:"Normal: 1 · Mud: 4 · Water: 7 · Collect: 1"}
   ],
   schedule: [
     ["00:00","Inspect","Run the engine and inspect Observation."],
@@ -39,7 +39,7 @@ window.SITE_CONTENT = {
     {
       number: "01", title: "KEYED TREE ESCAPE",
       tagline: "Build a search tree, collect the right items, and reach the exit.",
-      focus: "DFS/BFS parent tree 쨌 Provided maps",
+      focus: "DFS/BFS parent tree · Provided maps",
       repositoryUrl: "https://github.com/rata-max/treasure-explorer-challenge/tree/main/treasure-explorer-week1-tree-escape",
       objectives: ["Build a DFS or BFS parent tree over the maze.", "Recover the unique path to a key, useful batteries, and the exit.", "Manage energy and reach the exit on all three released maps."],
       deliverables: ["student/agent.py", "Complexity and path-recovery note", "Results on easy, medium, and hard maps"],
@@ -52,7 +52,7 @@ window.SITE_CONTENT = {
     {
       number: "02", title: "RISK-AWARE ONLINE PLANNER",
       tagline: "Balance expected reward against uncertain travel costs.",
-      focus: "Intermediate practice 쨌 Provided scenarios",
+      focus: "Intermediate practice · Provided scenarios",
       repositoryUrl: "",
       objectives: ["Model expected and worst-case terrain costs.", "Adjust risk using remaining energy.", "Choose and abandon multi-treasure plans online."],
       deliverables: ["student/agent.py", "Risk model description", "Week 1 comparison"],
