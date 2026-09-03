@@ -1,0 +1,44 @@
+{
+  "title": "Terrain-Aware Treasure Bundle",
+  "energy": 63,
+  "visibility": "public",
+  "grid": [
+    "#################",
+    "#S...M.........E#",
+    "#.##.M.#####.##.#",
+    "#T...M...T.W..T.#",
+    "#.######.#.###..#",
+    "#.....T..#......#",
+    "#################"
+  ],
+  "treasures": [
+    {
+      "position": [
+        3,
+        1
+      ],
+      "value": 13
+    },
+    {
+      "position": [
+        3,
+        9
+      ],
+      "value": 24
+    },
+    {
+      "position": [
+        3,
+        14
+      ],
+      "value": 31
+    },
+    {
+      "position": [
+        5,
+        6
+      ],
+      "value": 20
+    }
+  ]
+}
