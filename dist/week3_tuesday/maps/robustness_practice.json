@@ -1,0 +1,60 @@
+{
+  "title": "Robustness Practice",
+  "energy": 130,
+  "visibility": "local",
+  "grid": [
+    "#####################",
+    "#S........#........E#",
+    "#.#.####..#.#####.#.#",
+    "#T#..T..W...T...M.#T#",
+    "#.#.###.#####.###.#.#",
+    "#...T.........T.....#",
+    "#####################"
+  ],
+  "treasures": [
+    {
+      "position": [
+        3,
+        1
+      ],
+      "value": 14
+    },
+    {
+      "position": [
+        3,
+        5
+      ],
+      "value": 33
+    },
+    {
+      "position": [
+        3,
+        12
+      ],
+      "value": 21
+    },
+    {
+      "position": [
+        3,
+        19
+      ],
+      "value": 44
+    },
+    {
+      "position": [
+        5,
+        4
+      ],
+      "value": 26
+    },
+    {
+      "position": [
+        5,
+        14
+      ],
+      "value": 19
+    }
+  ],
+  "reveal_radius": 1,
+  "hidden_values": true
+}
