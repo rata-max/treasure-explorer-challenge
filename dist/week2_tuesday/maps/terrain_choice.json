@@ -1,0 +1,21 @@
+{
+  "title": "Terrain Choice",
+  "energy": 42,
+  "visibility": "public",
+  "grid": [
+    "###############",
+    "#S..MMMM.....E#",
+    "#.#.#####.###.#",
+    "#...W...T.....#",
+    "###############"
+  ],
+  "treasures": [
+    {
+      "position": [
+        3,
+        8
+      ],
+      "value": 22
+    }
+  ]
+}
