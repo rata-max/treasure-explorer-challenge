@@ -1,0 +1,19 @@
+{
+  "title": "Warm-up: One Useful Stop",
+  "energy": 18,
+  "visibility": "public",
+  "grid": [
+    "###########",
+    "#S....T..E#",
+    "###########"
+  ],
+  "treasures": [
+    {
+      "position": [
+        1,
+        6
+      ],
+      "value": 8
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Two Branches",
+  "energy": 34,
+  "visibility": "public",
+  "grid": [
+    "###########",
+    "#S....T..E#",
+    "#####.#####",
+    "#T....#####",
+    "###########"
+  ],
+  "treasures": [
+    {
+      "position": [
+        1,
+        6
+      ],
+      "value": 8
+    },
+    {
+      "position": [
+        3,
+        1
+      ],
+      "value": 20
+    }
+  ]
+}
