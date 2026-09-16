@@ -1,13 +1,218 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project Rulebook · Treasure Explorer</title><link rel="stylesheet" href="globals.css"></head><body>
-<nav class="nav"><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><a class="navCta" href="index.html#schedule">VIEW ASSIGNMENTS →</a></nav>
-<main class="assignmentPage"><header class="assignmentHero"><div class="assignmentHeroCopy"><p>PROJECT-WIDE CONTRACT</p><h1>Treasure Explorer Rulebook</h1><p>These rules apply to every stage unless a stage page explicitly introduces a stricter rule.</p><div class="focusTag">ONE STAGE · ONE GENERIC AGENT · MANY MAPS</div></div></header>
-<section class="hiddenEval"><span>THE NON-NEGOTIABLE RULE</span><h2>No exit, no score.</h2><p>Collected treasure counts only when the agent reaches the exit. A safe baseline is valid; stronger planning earns a higher score.</p></section>
-<section class="contract"><p class="sectionCode">00 / RUNNING A STAGE</p><h2>One file, many independent runs.</h2><div class="contractGrid"><div><h3>Folder and single-map command</h3><ul><li>Extract the stage ZIP and open the folder containing <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.</li><li>Run <code>python -m treasure_explorer --map maps/&lt;map-file&gt;.json --agent agent.py --view</code>.</li><li>Change only the value following <code>--map</code> to test another map.</li><li><code>--view</code> animates the run; <code>--delay 0.4</code> slows it; <code>--no-clear</code> keeps every frame.</li></ul></div><div><h3>Run every released map</h3><ul><li>PowerShell: <code>Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }</code></li><li>Bash/macOS: <code>for map in maps/*.json; do python -m treasure_explorer --map "$map" --agent agent.py; done</code></li><li>Tests: <code>python -m unittest discover -s tests -v</code></li><li>Each command starts a fresh run; the same unchanged <code>agent.py</code> is loaded for every map.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">01 / OBJECTIVE AND EXECUTION</p><h2>Observe. Plan. Act. Repeat.</h2><div class="contractGrid"><div><h3>Core objective</h3><ul><li>Reach the exit within the energy budget.</li><li>Collect valuable treasure without sacrificing a safe exit.</li><li>Reduce wasted movement and invalid actions.</li><li>Generalize across every map in the stage.</li></ul></div><div><h3>Turn structure</h3><ul><li>The engine calls <code>choose_action(observation)</code> once per turn.</li><li>The agent returns exactly one supported action.</li><li>The engine updates position, energy, collection state, and visible information.</li><li>The next decision uses the updated observation.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">02 / ACTIONS AND ENERGY</p><h2>Every decision has a cost.</h2><div class="contractGrid"><div><h3>Supported actions</h3><ul><li><code>MOVE_UP</code>, <code>MOVE_DOWN</code>, <code>MOVE_LEFT</code>, <code>MOVE_RIGHT</code></li><li><code>COLLECT</code> while standing on an uncollected treasure</li><li>Cost is charged when entering a cell: normal, start, exit, and treasure 1; mud 4; water 7.</li><li><code>COLLECT</code> costs 1. Week 1 maps contain only unit-cost terrain.</li></ul></div><div><h3>Invalid actions</h3><ul><li>Moving outside the map, into a wall, or without enough energy</li><li>Collecting without an available treasure at the current position</li><li>Returning an unsupported value or raising an exception</li><li>An invalid action leaves position and energy unchanged, consumes one turn, and subtracts 5 points after a successful exit.</li><li>Repeated invalid actions can also reach the map's maximum-turn limit.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">03 / TREASURE, EXIT, AND SCORE</p><h2>Optimize the complete expedition.</h2><div class="contractGrid"><div><h3>Treasure and exit</h3><ul><li>Arriving at a treasure does not collect it; use <code>COLLECT</code>.</li><li>Entering the exit immediately ends the run.</li><li>The exit is a final destination, not an intermediate waypoint.</li><li>Preserve the energy required for a safe exit.</li></ul></div><div><h3>Base score</h3><ul><li><code>Exit Bonus + Treasure Value + Remaining Energy - Invalid Penalties</code></li><li>Default exit bonus: 50.</li><li>Default invalid-action penalty: 5 per action.</li><li>A run that does not reach the exit receives 0.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">04 / INFORMATION CONTRACT</p><h2>Use only what the agent is allowed to know.</h2><div class="contractGrid"><div><h3>Observation</h3><ul><li>Observation may include turn, position, energy, visible grid, exit, and treasure information.</li><li><code>?</code> means unobserved, not safe or normal terrain.</li><li>Information may be remembered within the same run.</li><li>Separate runs must start with independent state.</li></ul></div><div><h3>Prohibited access</h3><ul><li>No access to original maps, hidden maps, seeds, or engine internals</li><li>No file discovery, networking, subprocesses, or environment probing</li><li>No reflection or side channels intended to recover hidden state</li><li>No information sharing between evaluation runs</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">05 / GENERALIZATION AND SUBMISSION</p><h2>Submit an algorithm, not a route.</h2><div class="contractGrid"><div><h3>One generic agent</h3><ul><li>Submit the root-level <code>agent.py</code> included in each released stage ZIP.</li><li>The evaluator loads that same file independently for every map in the stage.</li><li>Do not branch on filenames, titles, seeds, dimensions used as fingerprints, or memorized layouts.</li><li>Using observed grid dimensions and contents as ordinary algorithm inputs is allowed.</li></ul></div><div><h3>Submission boundary</h3><ul><li>Modify and submit <code>agent.py</code> only unless a stage page explicitly requests a report.</li><li>Do not modify the engine, maps, runner, tests, or configuration; evaluation uses clean official copies.</li><li>Use Python 3.11+ and the standard library only unless a stage explicitly states otherwise.</li><li>Week 2 and Week 3 artifacts, exact filenames, and stage-specific limits are announced when those stages unlock.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">06 / RUNTIME AND EVALUATION</p><h2>Strong, safe, and efficient.</h2><div class="contractGrid"><div><h3>Runtime contract</h3><ul><li>The public Week 1 runner has a maximum of 500 turns and no separate per-action timer.</li><li>Infinite loops or an uncaught exception can terminate or invalidate a run.</li><li>Any later per-action, total-runtime, or memory limit must be stated on that stage page before release.</li><li>Viewer delay is display time and is not part of algorithm performance.</li></ul></div><div><h3>Evaluation signals</h3><ul><li>Per-map score: <code>50 + collected treasure + remaining energy - 5 × invalid actions</code>, only after reaching the exit</li><li>Exit rate and invalid-action count across the stage map set</li><li>Runtime, code quality, and required design explanation</li><li>Week 3 Thursday may add unseen hidden-seed maps under its published evaluation contract.</li></ul></div></div></section>
-<section class="contract"><p class="sectionCode">07 / ACADEMIC INTEGRITY</p><h2>Your agent must be your work.</h2><ul><li>Do not copy, distribute, or publish another student's solution.</li><li>Do not publish a complete solution before grading ends.</li><li>Do not extract, share, or identify hidden maps and seeds.</li><li>Declare external references, reused code, and permitted AI assistance.</li><li>You must be able to explain every important design decision.</li></ul></section>
-</main><footer><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><p>Problem Solving Techniques · Fall 2026</p></footer></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project Rulebook · Treasure Explorer</title><link rel="stylesheet" href="globals.css">
+<style>.langBtn{background:none;border:1px solid currentColor;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:.72rem;letter-spacing:.06em;font-family:inherit;color:inherit;opacity:.65;transition:opacity .15s}.langBtn:hover{opacity:1}.ko{display:none}body.lang-ko .ko{display:inline}body.lang-ko .ko-block{display:block}body.lang-ko .en{display:none}body.lang-ko .en-block{display:none}</style>
+</head><body>
+<nav class="nav"><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><button id="langBtn" class="langBtn" onclick="toggleLang()">한국어</button><a class="navCta" href="index.html#schedule"><span class="en">VIEW ASSIGNMENTS →</span><span class="ko">과제 목록 →</span></a></nav>
+<main class="assignmentPage"><header class="assignmentHero"><div class="assignmentHeroCopy">
+  <p><span class="en">PROJECT-WIDE CONTRACT</span><span class="ko">프로젝트 전체 계약</span></p>
+  <h1><span class="en">Treasure Explorer Rulebook</span><span class="ko">Treasure Explorer 규칙집</span></h1>
+  <p><span class="en">These rules apply to every stage unless a stage page explicitly introduces a stricter rule.</span><span class="ko">단계별 페이지에서 더 엄격한 규칙을 명시하지 않는 한, 이 규칙은 모든 단계에 적용됩니다.</span></p>
+  <div class="focusTag"><span class="en">ONE STAGE · ONE GENERIC AGENT · MANY MAPS</span><span class="ko">하나의 단계 · 하나의 범용 에이전트 · 다수의 맵</span></div>
+</div></header>
+
+<section class="hiddenEval">
+  <span><span class="en">THE NON-NEGOTIABLE RULE</span><span class="ko">절대 규칙</span></span>
+  <h2><span class="en">No exit, no score.</span><span class="ko">출구 미도달 시 점수 없음.</span></h2>
+  <p><span class="en">Collected treasure counts only when the agent reaches the exit. A safe baseline is valid; stronger planning earns a higher score.</span><span class="ko">수집한 보물은 에이전트가 출구에 도달해야만 점수로 인정됩니다. 안전한 기본 전략은 유효하며, 더 강한 계획은 더 높은 점수를 얻습니다.</span></p>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">00 / RUNNING A STAGE</span><span class="ko">00 / 단계 실행</span></p>
+  <h2><span class="en">One file, many independent runs.</span><span class="ko">하나의 파일, 여러 독립 실행.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Folder and single-map command</span><span class="ko">폴더 및 단일 맵 명령</span></h3>
+      <ul>
+        <li><span class="en">Extract the stage ZIP and open the folder containing <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.</span><span class="ko">단계 ZIP을 압축 해제하고, <code>agent.py</code>, <code>maps/</code>, <code>treasure_explorer/</code>가 있는 폴더를 여세요.</span></li>
+        <li><span class="en">Run <code>python -m treasure_explorer --map maps/&lt;map-file&gt;.json --agent agent.py --view</code>.</span><span class="ko"><code>python -m treasure_explorer --map maps/&lt;맵 파일&gt;.json --agent agent.py --view</code>를 실행하세요.</span></li>
+        <li><span class="en">Change only the value following <code>--map</code> to test another map.</span><span class="ko">다른 맵을 테스트하려면 <code>--map</code> 뒤의 값만 바꾸세요.</span></li>
+        <li><span class="en"><code>--view</code> animates the run; <code>--delay 0.4</code> slows it; <code>--no-clear</code> keeps every frame.</span><span class="ko"><code>--view</code>는 실행을 애니메이션으로 표시합니다. <code>--delay 0.4</code>는 속도를 늦추고, <code>--no-clear</code>는 모든 프레임을 유지합니다.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Run every released map</span><span class="ko">배포된 모든 맵 실행</span></h3>
+      <ul>
+        <li><span class="en">PowerShell: <code>Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }</code></span><span class="ko">PowerShell: <code>Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }</code></span></li>
+        <li><span class="en">Bash/macOS: <code>for map in maps/*.json; do python -m treasure_explorer --map "$map" --agent agent.py; done</code></span><span class="ko">Bash/macOS: <code>for map in maps/*.json; do python -m treasure_explorer --map "$map" --agent agent.py; done</code></span></li>
+        <li><span class="en">Tests: <code>python -m unittest discover -s tests -v</code></span><span class="ko">테스트: <code>python -m unittest discover -s tests -v</code></span></li>
+        <li><span class="en">Each command starts a fresh run; the same unchanged <code>agent.py</code> is loaded for every map.</span><span class="ko">각 명령은 새 실행을 시작하며, 동일한 <code>agent.py</code>가 모든 맵에 로드됩니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">01 / OBJECTIVE AND EXECUTION</span><span class="ko">01 / 목표 및 실행</span></p>
+  <h2><span class="en">Observe. Plan. Act. Repeat.</span><span class="ko">관측. 계획. 행동. 반복.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Core objective</span><span class="ko">핵심 목표</span></h3>
+      <ul>
+        <li><span class="en">Reach the exit within the energy budget.</span><span class="ko">에너지 예산 내에 출구에 도달하세요.</span></li>
+        <li><span class="en">Collect valuable treasure without sacrificing a safe exit.</span><span class="ko">안전한 출구 경로를 희생하지 않고 가치 있는 보물을 수집하세요.</span></li>
+        <li><span class="en">Reduce wasted movement and invalid actions.</span><span class="ko">불필요한 이동과 무효 행동을 줄이세요.</span></li>
+        <li><span class="en">Generalize across every map in the stage.</span><span class="ko">단계의 모든 맵에 범용적으로 대응하세요.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Turn structure</span><span class="ko">턴 구조</span></h3>
+      <ul>
+        <li><span class="en">The engine calls <code>choose_action(observation)</code> once per turn.</span><span class="ko">엔진은 매 턴 <code>choose_action(observation)</code>을 한 번 호출합니다.</span></li>
+        <li><span class="en">The agent returns exactly one supported action.</span><span class="ko">에이전트는 지원되는 행동 하나만 반환합니다.</span></li>
+        <li><span class="en">The engine updates position, energy, collection state, and visible information.</span><span class="ko">엔진은 위치, 에너지, 수집 상태, 가시 정보를 업데이트합니다.</span></li>
+        <li><span class="en">The next decision uses the updated observation.</span><span class="ko">다음 결정은 업데이트된 관측을 사용합니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">02 / ACTIONS AND ENERGY</span><span class="ko">02 / 행동 및 에너지</span></p>
+  <h2><span class="en">Every decision has a cost.</span><span class="ko">모든 결정에는 비용이 따릅니다.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Supported actions</span><span class="ko">지원 행동</span></h3>
+      <ul>
+        <li><code>MOVE_UP</code>, <code>MOVE_DOWN</code>, <code>MOVE_LEFT</code>, <code>MOVE_RIGHT</code></li>
+        <li><span class="en"><code>COLLECT</code> while standing on an uncollected treasure</span><span class="ko">미수집 보물 위에서 <code>COLLECT</code></span></li>
+        <li><span class="en">Cost is charged when entering a cell: normal, start, exit, and treasure 1; mud 4; water 7.</span><span class="ko">셀에 진입할 때 비용이 부과됩니다: 일반·시작·출구·보물 1, 진흙 4, 물 7.</span></li>
+        <li><span class="en"><code>COLLECT</code> costs 1. Week 1 maps contain only unit-cost terrain.</span><span class="ko"><code>COLLECT</code>는 에너지 1을 소비합니다. 1주차 맵은 단위 비용 지형만 포함합니다.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Invalid actions</span><span class="ko">무효 행동</span></h3>
+      <ul>
+        <li><span class="en">Moving outside the map, into a wall, or without enough energy</span><span class="ko">맵 밖으로 이동, 벽으로 이동, 에너지 부족 이동</span></li>
+        <li><span class="en">Collecting without an available treasure at the current position</span><span class="ko">현재 위치에 수집 가능한 보물이 없을 때 COLLECT</span></li>
+        <li><span class="en">Returning an unsupported value or raising an exception</span><span class="ko">지원되지 않는 값 반환 또는 예외 발생</span></li>
+        <li><span class="en">An invalid action leaves position and energy unchanged, consumes one turn, and subtracts 5 points after a successful exit.</span><span class="ko">무효 행동은 위치와 에너지를 변경하지 않고 한 턴을 소비하며, 성공적인 출구 이후 5점을 차감합니다.</span></li>
+        <li><span class="en">Repeated invalid actions can also reach the map's maximum-turn limit.</span><span class="ko">반복된 무효 행동은 맵의 최대 턴 제한에 도달할 수 있습니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">03 / TREASURE, EXIT, AND SCORE</span><span class="ko">03 / 보물, 출구, 점수</span></p>
+  <h2><span class="en">Optimize the complete expedition.</span><span class="ko">전체 탐험을 최적화하세요.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Treasure and exit</span><span class="ko">보물과 출구</span></h3>
+      <ul>
+        <li><span class="en">Arriving at a treasure does not collect it; use <code>COLLECT</code>.</span><span class="ko">보물에 도착한다고 자동으로 수집되지 않습니다. <code>COLLECT</code>를 사용하세요.</span></li>
+        <li><span class="en">Entering the exit immediately ends the run.</span><span class="ko">출구에 진입하면 즉시 실행이 종료됩니다.</span></li>
+        <li><span class="en">The exit is a final destination, not an intermediate waypoint.</span><span class="ko">출구는 최종 목적지이며 중간 경유지로 사용할 수 없습니다.</span></li>
+        <li><span class="en">Preserve the energy required for a safe exit.</span><span class="ko">안전한 출구에 필요한 에너지를 항상 확보하세요.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Base score</span><span class="ko">기본 점수</span></h3>
+      <ul>
+        <li><span class="en"><code>Exit Bonus + Treasure Value + Remaining Energy - Invalid Penalties</code></span><span class="ko"><code>출구 보너스 + 보물 가치 + 남은 에너지 - 무효 행동 패널티</code></span></li>
+        <li><span class="en">Default exit bonus: 50.</span><span class="ko">기본 출구 보너스: 50.</span></li>
+        <li><span class="en">Default invalid-action penalty: 5 per action.</span><span class="ko">기본 무효 행동 패널티: 행동당 5점.</span></li>
+        <li><span class="en">A run that does not reach the exit receives 0.</span><span class="ko">출구에 도달하지 못한 실행은 0점입니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">04 / INFORMATION CONTRACT</span><span class="ko">04 / 정보 계약</span></p>
+  <h2><span class="en">Use only what the agent is allowed to know.</span><span class="ko">에이전트가 알 수 있도록 허용된 정보만 사용하세요.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Observation</span><span class="ko">관측 (Observation)</span></h3>
+      <ul>
+        <li><span class="en">Observation may include turn, position, energy, visible grid, exit, and treasure information.</span><span class="ko">관측에는 턴, 위치, 에너지, 가시 격자, 출구, 보물 정보가 포함될 수 있습니다.</span></li>
+        <li><span class="en"><code>?</code> means unobserved, not safe or normal terrain.</span><span class="ko"><code>?</code>는 미관측을 의미하며 안전하거나 일반적인 지형을 의미하지 않습니다.</span></li>
+        <li><span class="en">Information may be remembered within the same run.</span><span class="ko">정보는 같은 실행 내에서 기억할 수 있습니다.</span></li>
+        <li><span class="en">Separate runs must start with independent state.</span><span class="ko">별도의 실행은 독립적인 상태에서 시작해야 합니다.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Prohibited access</span><span class="ko">금지된 접근</span></h3>
+      <ul>
+        <li><span class="en">No access to original maps, hidden maps, seeds, or engine internals</span><span class="ko">원본 맵, 숨겨진 맵, 시드, 엔진 내부에 접근 금지</span></li>
+        <li><span class="en">No file discovery, networking, subprocesses, or environment probing</span><span class="ko">파일 탐색, 네트워크, 서브프로세스, 환경 탐지 금지</span></li>
+        <li><span class="en">No reflection or side channels intended to recover hidden state</span><span class="ko">숨겨진 상태를 복원하기 위한 리플렉션 또는 사이드 채널 금지</span></li>
+        <li><span class="en">No information sharing between evaluation runs</span><span class="ko">평가 실행 간 정보 공유 금지</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">05 / GENERALIZATION AND SUBMISSION</span><span class="ko">05 / 범용화 및 제출</span></p>
+  <h2><span class="en">Submit an algorithm, not a route.</span><span class="ko">경로가 아닌 알고리즘을 제출하세요.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">One generic agent</span><span class="ko">하나의 범용 에이전트</span></h3>
+      <ul>
+        <li><span class="en">Submit the root-level <code>agent.py</code> included in each released stage ZIP.</span><span class="ko">배포된 단계 ZIP에 포함된 루트 레벨 <code>agent.py</code>를 제출하세요.</span></li>
+        <li><span class="en">The evaluator loads that same file independently for every map in the stage.</span><span class="ko">평가기는 단계의 모든 맵에 대해 동일한 파일을 독립적으로 로드합니다.</span></li>
+        <li><span class="en">Do not branch on filenames, titles, seeds, dimensions used as fingerprints, or memorized layouts.</span><span class="ko">파일 이름, 제목, 시드, 지문으로 사용되는 크기, 또는 기억된 레이아웃으로 분기하지 마세요.</span></li>
+        <li><span class="en">Using observed grid dimensions and contents as ordinary algorithm inputs is allowed.</span><span class="ko">관측된 격자 크기와 내용을 일반적인 알고리즘 입력으로 사용하는 것은 허용됩니다.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Submission boundary</span><span class="ko">제출 범위</span></h3>
+      <ul>
+        <li><span class="en">Modify and submit <code>agent.py</code> only unless a stage page explicitly requests a report.</span><span class="ko">단계 페이지에서 보고서를 명시적으로 요청하지 않는 한 <code>agent.py</code>만 수정하여 제출하세요.</span></li>
+        <li><span class="en">Do not modify the engine, maps, runner, tests, or configuration; evaluation uses clean official copies.</span><span class="ko">엔진, 맵, 러너, 테스트, 설정은 수정하지 마세요. 평가는 공식 원본을 사용합니다.</span></li>
+        <li><span class="en">Use Python 3.11+ and the standard library only unless a stage explicitly states otherwise.</span><span class="ko">단계에서 명시하지 않는 한 Python 3.11+ 표준 라이브러리만 사용하세요.</span></li>
+        <li><span class="en">Week 2 and Week 3 artifacts, exact filenames, and stage-specific limits are announced when those stages unlock.</span><span class="ko">2주차·3주차 산출물, 파일 이름, 단계별 제한은 해당 단계가 공개될 때 발표됩니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">06 / RUNTIME AND EVALUATION</span><span class="ko">06 / 런타임 및 평가</span></p>
+  <h2><span class="en">Strong, safe, and efficient.</span><span class="ko">강력하고, 안전하고, 효율적이게.</span></h2>
+  <div class="contractGrid">
+    <div>
+      <h3><span class="en">Runtime contract</span><span class="ko">런타임 계약</span></h3>
+      <ul>
+        <li><span class="en">The public Week 1 runner has a maximum of 500 turns and no separate per-action timer.</span><span class="ko">공개 1주차 러너는 최대 500 턴이며 별도의 행동별 타이머가 없습니다.</span></li>
+        <li><span class="en">Infinite loops or an uncaught exception can terminate or invalidate a run.</span><span class="ko">무한 루프나 처리되지 않은 예외는 실행을 종료하거나 무효화할 수 있습니다.</span></li>
+        <li><span class="en">Any later per-action, total-runtime, or memory limit must be stated on that stage page before release.</span><span class="ko">이후 행동별·전체 런타임·메모리 제한은 해당 단계 페이지에서 배포 전에 명시됩니다.</span></li>
+        <li><span class="en">Viewer delay is display time and is not part of algorithm performance.</span><span class="ko">뷰어 지연은 표시 시간이며 알고리즘 성능에 포함되지 않습니다.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="en">Evaluation signals</span><span class="ko">평가 신호</span></h3>
+      <ul>
+        <li><span class="en">Per-map score: <code>50 + collected treasure + remaining energy - 5 × invalid actions</code>, only after reaching the exit</span><span class="ko">맵별 점수: <code>50 + 수집한 보물 + 남은 에너지 - 5 × 무효 행동</code> (출구 도달 후에만)</span></li>
+        <li><span class="en">Exit rate and invalid-action count across the stage map set</span><span class="ko">단계 맵 세트 전체의 출구 도달률 및 무효 행동 횟수</span></li>
+        <li><span class="en">Runtime, code quality, and required design explanation</span><span class="ko">런타임, 코드 품질, 필수 설계 설명</span></li>
+        <li><span class="en">Week 3 Thursday may add unseen hidden-seed maps under its published evaluation contract.</span><span class="ko">3주차 목요일은 공개된 평가 계약에 따라 미공개 숨겨진 시드 맵이 추가될 수 있습니다.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="contract">
+  <p class="sectionCode"><span class="en">07 / ACADEMIC INTEGRITY</span><span class="ko">07 / 학문적 성실성</span></p>
+  <h2><span class="en">Your agent must be your work.</span><span class="ko">에이전트는 본인의 작업이어야 합니다.</span></h2>
+  <ul>
+    <li><span class="en">Do not copy, distribute, or publish another student's solution.</span><span class="ko">다른 학생의 솔루션을 복사, 배포, 게시하지 마세요.</span></li>
+    <li><span class="en">Do not publish a complete solution before grading ends.</span><span class="ko">채점이 끝나기 전에 완전한 솔루션을 게시하지 마세요.</span></li>
+    <li><span class="en">Do not extract, share, or identify hidden maps and seeds.</span><span class="ko">숨겨진 맵과 시드를 추출, 공유, 식별하지 마세요.</span></li>
+    <li><span class="en">Declare external references, reused code, and permitted AI assistance.</span><span class="ko">외부 참고 자료, 재사용 코드, 허용된 AI 사용을 명시하세요.</span></li>
+    <li><span class="en">You must be able to explain every important design decision.</span><span class="ko">모든 중요한 설계 결정을 설명할 수 있어야 합니다.</span></li>
+  </ul>
+</section>
+</main>
+<footer><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><p>Problem Solving Techniques · Fall 2026</p></footer>
+<script>
+const _gl=()=>localStorage.getItem('te-lang')||'en';
+function toggleLang(){
+  const n=_gl()==='ko'?'en':'ko';
+  localStorage.setItem('te-lang',n);
+  document.body.classList.toggle('lang-ko', n==='ko');
+  document.getElementById('langBtn').textContent=n==='ko'?'EN':'한국어';
+}
+document.body.classList.toggle('lang-ko', _gl()==='ko');
+document.getElementById('langBtn').textContent=_gl()==='ko'?'EN':'한국어';
+</script>
+</body></html>
