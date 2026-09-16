@@ -6,11 +6,13 @@
   <title>Treasure Explorer Assignment</title>
   <link rel="stylesheet" href="globals.css?v=layout-20260829">
   <script src="content.js?v=release-20260829b"></script>
+  <style>.langBtn{background:none;border:1px solid currentColor;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:.72rem;letter-spacing:.06em;font-family:inherit;color:inherit;opacity:.65;transition:opacity .15s}.langBtn:hover{opacity:1}</style>
 </head>
 <body>
   <nav class="nav">
     <a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a>
-    <a class="navCta" href="index.html#schedule">ALL WEEKS →</a>
+    <button id="langBtn" class="langBtn" onclick="toggleLang()">한국어</button>
+    <a class="navCta" id="allWeeksLink" href="index.html#schedule">ALL WEEKS →</a>
   </nav>
   <main class="assignmentPage">
     <header class="assignmentHero">
@@ -21,57 +23,132 @@
       <a class="repositoryCta" id="repositoryCta">DOWNLOAD STARTER →</a>
     </header>
     <section class="assignmentGrid">
-      <article><p class="sectionCode">OBJECTIVES</p><div id="objectives"></div></article>
-      <article><p class="sectionCode">DELIVERABLES</p><div id="deliverables"></div></article>
+      <article><p class="sectionCode" id="objLabel">OBJECTIVES</p><div id="objectives"></div></article>
+      <article><p class="sectionCode" id="delLabel">DELIVERABLES</p><div id="deliverables"></div></article>
     </section>
     <section class="runGuide">
-      <p class="sectionCode">RUN THE SAME AGENT ON EVERY MAP</p>
-      <h2>Change the map argument, not the agent.</h2>
-      <p>Open the extracted stage folder in VS Code. Run these commands from the folder that directly contains <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.</p>
+      <p class="sectionCode" id="runSectionCode">RUN THE SAME AGENT ON EVERY MAP</p>
+      <h2 id="runH2">Change the map argument, not the agent.</h2>
+      <p id="runDesc">Open the extracted stage folder in VS Code. Run these commands from the folder that directly contains <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.</p>
       <div class="commandList">
-        <div><strong>ONE MAP WITH VIEWER</strong><code id="stageCommand"></code></div>
-        <div><strong>ALL MAPS · POWERSHELL</strong><code id="powershellCommand"></code></div>
-        <div><strong>ALL MAPS · BASH / MACOS</strong><code id="bashCommand"></code></div>
-        <div><strong>PACKAGE TESTS</strong><code id="testCommand"></code></div>
+        <div><strong id="cmdOneLabel">ONE MAP WITH VIEWER</strong><code id="stageCommand"></code></div>
+        <div><strong id="cmdPsLabel">ALL MAPS · POWERSHELL</strong><code id="powershellCommand"></code></div>
+        <div><strong id="cmdBashLabel">ALL MAPS · BASH / MACOS</strong><code id="bashCommand"></code></div>
+        <div><strong id="cmdTestLabel">PACKAGE TESTS</strong><code id="testCommand"></code></div>
       </div>
-      <p><code>--view</code> animates the map. Add <code>--delay 0.4</code> to slow it down or <code>--no-clear</code> to preserve every frame. Each command starts a fresh, independent run.</p>
+      <p id="runNote"><code>--view</code> animates the map. Add <code>--delay 0.4</code> to slow it down or <code>--no-clear</code> to preserve every frame. Each command starts a fresh, independent run.</p>
     </section>
     <section class="contract">
-      <p class="sectionCode">STAGE RULES</p><h2>What changes in this assignment.</h2>
+      <p class="sectionCode" id="stageRulesLabel">STAGE RULES</p><h2 id="stageRulesH2">What changes in this assignment.</h2>
       <div class="contractGrid">
-        <div><h3>Rules for this stage</h3><ul id="stageRules"></ul></div>
-        <div><h3>Project-wide contract</h3><ul id="submissionRules"></ul><p><a class="repositoryCta" href="rules.html">READ THE FULL RULEBOOK →</a></p></div>
+        <div><h3 id="thisStageH3">Rules for this stage</h3><ul id="stageRules"></ul></div>
+        <div><h3 id="projectH3">Project-wide contract</h3><ul id="submissionRules"></ul><p><a class="repositoryCta" href="rules.html" id="rulebookLink">READ THE FULL RULEBOOK →</a></p></div>
       </div>
     </section>
-    <section class="contract"><p class="sectionCode">ACADEMIC INTEGRITY</p><h2>Build a general solution.</h2><ul id="integrityRules"></ul></section>
+    <section class="contract"><p class="sectionCode" id="integrityLabel">ACADEMIC INTEGRITY</p><h2 id="integrityH2">Build a general solution.</h2><ul id="integrityRules"></ul></section>
     <section class="hiddenEval"><span id="evaluationLabel"></span><h2 id="evaluationTitle"></h2><p id="evaluationText"></p></section>
   </main>
   <footer><a class="brand" href="index.html"><span>TE</span> TREASURE EXPLORER</a><p>Problem Solving Techniques · Fall 2026</p></footer>
   <script>
-    const c=window.SITE_CONTENT;
-    const n=Math.min(c.stages.length,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
-    const w=c.stages[n-1];
-    if(!w.unlocked) location.replace('index.html#schedule');
-    document.title=`${w.week} · ${w.day} · ${w.title}`;
-    document.getElementById('weekLabel').textContent=`${w.week} · ${w.day} / ASSIGNMENT`;
-    document.getElementById('weekTitle').textContent=w.title;
-    document.getElementById('weekTagline').textContent=w.tagline;
-    document.getElementById('weekFocus').textContent=w.focus;
-    const repo=document.getElementById('repositoryCta');
-    if(w.repositoryUrl){repo.href=w.repositoryUrl}else{repo.hidden=true}
-    const list=(id,items)=>document.getElementById(id).innerHTML=items.map(x=>`<div class="numberedItem"><span>✓</span><p>${x}</p></div>`).join('');
-    list('objectives',w.objectives); list('deliverables',w.deliverables);
-    document.getElementById('stageRules').innerHTML=c.stageRules[n-1].map(x=>`<li>${x}</li>`).join('');
-    document.getElementById('submissionRules').innerHTML=c.submissionRules.map(x=>`<li>${x}</li>`).join('');
-    document.getElementById('integrityRules').innerHTML=c.integrityRules.map(x=>`<li>${x}</li>`).join('');
-    document.getElementById('stageCommand').textContent=c.stageCommands[n-1];
-    document.getElementById('powershellCommand').textContent=c.batchCommands.powershell;
-    document.getElementById('bashCommand').textContent=c.batchCommands.bash;
-    document.getElementById('testCommand').textContent=c.batchCommands.tests;
-    document.getElementById('evaluationLabel').textContent=w.evaluation.label;
-    document.getElementById('evaluationTitle').textContent=w.evaluation.title;
-    document.getElementById('evaluationText').textContent=w.evaluation.text;
+    const _STATIC_KO = {
+      allWeeksLink: 'ALL WEEKS →',
+      objLabel: '목표',
+      delLabel: '제출물',
+      runSectionCode: '모든 맵에서 동일한 에이전트 실행',
+      runH2: '에이전트가 아닌 맵 인자를 바꾸세요.',
+      runDesc: '압축을 해제한 단계 폴더를 VS Code에서 열고, <code>agent.py</code>, <code>maps/</code>, <code>treasure_explorer/</code>가 있는 폴더에서 아래 명령을 실행하세요.',
+      cmdOneLabel: '뷰어로 맵 하나 실행',
+      cmdPsLabel: '전체 맵 · PowerShell',
+      cmdBashLabel: '전체 맵 · Bash / macOS',
+      cmdTestLabel: '패키지 테스트',
+      runNote: '<code>--view</code>는 맵을 애니메이션으로 표시합니다. <code>--delay 0.4</code>를 추가하면 속도가 느려지고, <code>--no-clear</code>를 추가하면 모든 프레임이 유지됩니다. 각 명령은 독립적인 새 실행을 시작합니다.',
+      stageRulesLabel: '단계 규칙',
+      stageRulesH2: '이 과제에서 달라지는 점',
+      thisStageH3: '이 단계의 규칙',
+      projectH3: '전체 프로젝트 계약',
+      rulebookLink: '전체 규칙집 읽기 →',
+      integrityLabel: '학문적 성실성',
+      integrityH2: '범용 솔루션을 제출하세요.',
+    };
+    const _STATIC_EN = {
+      allWeeksLink: 'ALL WEEKS →',
+      objLabel: 'OBJECTIVES',
+      delLabel: 'DELIVERABLES',
+      runSectionCode: 'RUN THE SAME AGENT ON EVERY MAP',
+      runH2: 'Change the map argument, not the agent.',
+      runDesc: 'Open the extracted stage folder in VS Code. Run these commands from the folder that directly contains <code>agent.py</code>, <code>maps/</code>, and <code>treasure_explorer/</code>.',
+      cmdOneLabel: 'ONE MAP WITH VIEWER',
+      cmdPsLabel: 'ALL MAPS · POWERSHELL',
+      cmdBashLabel: 'ALL MAPS · BASH / MACOS',
+      cmdTestLabel: 'PACKAGE TESTS',
+      runNote: '<code>--view</code> animates the map. Add <code>--delay 0.4</code> to slow it down or <code>--no-clear</code> to preserve every frame. Each command starts a fresh, independent run.',
+      stageRulesLabel: 'STAGE RULES',
+      stageRulesH2: 'What changes in this assignment.',
+      thisStageH3: 'Rules for this stage',
+      projectH3: 'Project-wide contract',
+      rulebookLink: 'READ THE FULL RULEBOOK →',
+      integrityLabel: 'ACADEMIC INTEGRITY',
+      integrityH2: 'Build a general solution.',
+    };
+
+    const _gl=()=>localStorage.getItem('te-lang')||'en';
+    const _gc=()=>_gl()==='ko'&&window.SITE_CONTENT_KO?window.SITE_CONTENT_KO:window.SITE_CONTENT;
+
+    function _updateStatic(isKo) {
+      const s = isKo ? _STATIC_KO : _STATIC_EN;
+      for (const [id, html] of Object.entries(s)) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+      }
+      const repo = document.getElementById('repositoryCta');
+      if (repo && repo.href) repo.textContent = isKo ? '스타터 다운로드 →' : 'DOWNLOAD STARTER →';
+    }
+
+    function _render(c) {
+      const n = Math.min(c.stages.length, Math.max(1, Number(new URLSearchParams(location.search).get('stage')) || 1));
+      const w = c.stages[n-1];
+      const isKo = c === window.SITE_CONTENT_KO;
+
+      document.getElementById('weekLabel').textContent = `${w.week} · ${w.day} / ${isKo ? '과제' : 'ASSIGNMENT'}`;
+      document.getElementById('weekTitle').textContent = w.title;
+      document.getElementById('weekTagline').textContent = w.tagline;
+      document.getElementById('weekFocus').textContent = w.focus;
+
+      const repo = document.getElementById('repositoryCta');
+      if (w.repositoryUrl) { repo.href = w.repositoryUrl; repo.hidden = false; }
+      else { repo.hidden = true; }
+
+      const list = (id, items) => document.getElementById(id).innerHTML = items.map(x => `<div class="numberedItem"><span>✓</span><p>${x}</p></div>`).join('');
+      list('objectives', w.objectives);
+      list('deliverables', w.deliverables);
+
+      document.getElementById('stageRules').innerHTML = c.stageRules[n-1].map(x => `<li>${x}</li>`).join('');
+      document.getElementById('submissionRules').innerHTML = c.submissionRules.map(x => `<li>${x}</li>`).join('');
+      document.getElementById('integrityRules').innerHTML = c.integrityRules.map(x => `<li>${x}</li>`).join('');
+      document.getElementById('stageCommand').textContent = c.stageCommands[n-1];
+      document.getElementById('powershellCommand').textContent = c.batchCommands.powershell;
+      document.getElementById('bashCommand').textContent = c.batchCommands.bash;
+      document.getElementById('testCommand').textContent = c.batchCommands.tests;
+      document.getElementById('evaluationLabel').textContent = w.evaluation.label;
+      document.getElementById('evaluationTitle').textContent = w.evaluation.title;
+      document.getElementById('evaluationText').textContent = w.evaluation.text;
+      _updateStatic(isKo);
+    }
+
+    // Initial unlock check (use English content for the check)
+    const _n0 = Math.min(window.SITE_CONTENT.stages.length, Math.max(1, Number(new URLSearchParams(location.search).get('stage')) || 1));
+    if (!window.SITE_CONTENT.stages[_n0-1].unlocked) location.replace('index.html#schedule');
+    document.title = `${window.SITE_CONTENT.stages[_n0-1].week} · ${window.SITE_CONTENT.stages[_n0-1].day} · ${window.SITE_CONTENT.stages[_n0-1].title}`;
+
+    function toggleLang() {
+      const n = _gl() === 'ko' ? 'en' : 'ko';
+      localStorage.setItem('te-lang', n);
+      _render(_gc());
+      document.getElementById('langBtn').textContent = n === 'ko' ? 'EN' : '한국어';
+    }
+
+    _render(_gc());
+    document.getElementById('langBtn').textContent = _gl() === 'ko' ? 'EN' : '한국어';
   </script>
 </body>
 </html>
-
