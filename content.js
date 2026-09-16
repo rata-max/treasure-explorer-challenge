@@ -138,7 +138,7 @@ window.SITE_CONTENT_KO = {
   title: "탐험하라.",
   subtitle: "수집하라. 귀환하라.",
   description: "각 단계마다 범용 에이전트를 하나 제작하세요. 배포된 모든 맵에서 코드 수정 없이 실행하고, 수익성 있는 보물을 수집하면서 출구까지의 안전한 경로를 항상 확보하세요.",
-  labHours: "6H", initialEnergy: "맵 설정", submission: "agent.py",
+  labHours: "6H", initialEnergy: "MAP", submission: "agent.py",
   pythonVersion: "Python 3.11+",
   command: "python -m treasure_explorer --map maps/warmup.json --agent agent.py --view",
   scoreFormula: "50 출구 보너스 + 보물 가치 + 남은 에너지 - 5 × 무효 행동",
