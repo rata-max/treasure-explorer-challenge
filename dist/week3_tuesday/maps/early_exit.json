@@ -1,0 +1,69 @@
+{
+  "title": "The Exit Comes Early",
+  "energy": 130,
+  "visibility": "local",
+  "reveal_radius": 1,
+  "hidden_values": true,
+  "grid": [
+    "#################",
+    "#E#..S..#.M.....#",
+    "#.#.#.###.#####T#",
+    "#.#.#M....M..W#W#",
+    "#.#.########..#.#",
+    "#.#...TT#.#...#.#",
+    "#.##.##.#.#####M#",
+    "#T.TT.M.#..T....#",
+    "#################"
+  ],
+  "treasures": [
+    {
+      "position": [
+        7,
+        4
+      ],
+      "value": 37
+    },
+    {
+      "position": [
+        2,
+        15
+      ],
+      "value": 10
+    },
+    {
+      "position": [
+        7,
+        3
+      ],
+      "value": 17
+    },
+    {
+      "position": [
+        7,
+        1
+      ],
+      "value": 14
+    },
+    {
+      "position": [
+        5,
+        6
+      ],
+      "value": 35
+    },
+    {
+      "position": [
+        7,
+        11
+      ],
+      "value": 8
+    },
+    {
+      "position": [
+        5,
+        7
+      ],
+      "value": 30
+    }
+  ]
+}

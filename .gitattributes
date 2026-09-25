@@ -1,0 +1,5 @@
+# Keep source files byte-identical on every OS. The fixed-file hash tests in
+# dist/*/tests/test_fixed_files.py depend on LF line endings.
+* text=auto eol=lf
+*.zip binary
+*.png binary

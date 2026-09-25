@@ -1,0 +1,83 @@
+{
+  "title": "Mud and Water Everywhere",
+  "energy": 309,
+  "visibility": "local",
+  "reveal_radius": 1,
+  "hidden_values": true,
+  "grid": [
+    "#########################",
+    "#...#ET.T....T.MT.#...#.#",
+    "###.##T.#########.#.#.#.#",
+    "#.#MTM..#....M..#M..#M..#",
+    "#.#######.###.#######.#T#",
+    "#MW...MW#...#....M#.MT#.#",
+    "#..S#######.#.###.#.###W#",
+    "#.#M......TMM...#..MWW..#",
+    "#########################"
+  ],
+  "treasures": [
+    {
+      "position": [
+        2,
+        6
+      ],
+      "value": 41
+    },
+    {
+      "position": [
+        4,
+        23
+      ],
+      "value": 36
+    },
+    {
+      "position": [
+        1,
+        8
+      ],
+      "value": 11
+    },
+    {
+      "position": [
+        1,
+        16
+      ],
+      "value": 39
+    },
+    {
+      "position": [
+        1,
+        13
+      ],
+      "value": 36
+    },
+    {
+      "position": [
+        5,
+        21
+      ],
+      "value": 9
+    },
+    {
+      "position": [
+        3,
+        4
+      ],
+      "value": 22
+    },
+    {
+      "position": [
+        1,
+        6
+      ],
+      "value": 9
+    },
+    {
+      "position": [
+        7,
+        10
+      ],
+      "value": 1
+    }
+  ]
+}

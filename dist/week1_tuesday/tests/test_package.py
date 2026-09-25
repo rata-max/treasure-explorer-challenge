@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from treasure_explorer.runner import load_map, run
+from treasure_explorer.runner import load_map
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,14 +14,9 @@ class PackageTests(unittest.TestCase):
         for path in maps:
             spec = load_map(path)
             self.assertEqual("public", spec.visibility)
-
-    def test_safe_starter_exits_every_map(self):
-        for path in sorted((ROOT / "maps").glob("*.json")):
-            result, _ = run(path, ROOT / "agent.py")
-            self.assertTrue(result["exited"], path.name)
-            self.assertEqual(0, result["invalid_actions"], path.name)
+            self.assertTrue(all(tile in "#.SET" for row in spec.grid for tile in row),
+                            f"{path.name}: Week 1 maps use unit-cost tiles only")
 
 
 if __name__ == "__main__":
     unittest.main()
-

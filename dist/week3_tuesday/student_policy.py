@@ -1,14 +1,27 @@
-"""WEEK 3 TUESDAY FINAL — edit only the two marked decision rules.
+"""WEEK 3 TUESDAY FINAL — Online exploration under fog (difficulty 5/5). Guide: README.md
 
-The fixed ``agent.py`` already handles fog, persistent state, frontier search,
-Dijkstra routing, online replanning, exit avoidance, and COLLECT lifecycle.
-Your job is to design a general rule for hidden values and safe exploration.
+Edit only this file: the two TODO functions, the constants, and any helper
+functions you add. The fixed agent.py builds the options and walks the route.
+
+Provided : Option list (frontiers + seen treasures with exact known costs),
+           Dijkstra movement that never crosses E, exit_cost(obs)
+You write: TODO 1 should_collect (handle exit_cost is None)
+           TODO 2 choose_target (steer the search, decide when to leave)
+Safety   : nothing stops you from running out of energy. Check
+           cost_to + cost_to_exit + SAFETY_MARGIN <= energy yourself.
+Measure  : python evaluate.py --seeds 100-299 (tune) and --seeds 0-99 (report)
+Minimum  : seeds 0-29 mean >= 200, exit rate >= 90 %, 0 invalid actions
+           (starter 166.8 / 90 %). Private evaluation: unpublished seeds of
+           treasure_explorer/generator.py plus hand-made maps.
+Grading  : private score 35, exit rate + invalid 15, experiments 20,
+           design note + presentation 20, code quality 10.
 """
 
 from treasure_explorer.model import Observation, TreasureInfo
+from policy_helpers import Option, exit_cost  # exit_cost(obs) = known energy here -> E, or None
 
 
-# You may tune constants or add small helper functions in this student section.
+# Constants you may tune. Explain every value you choose in the design note.
 SAFETY_MARGIN = 3
 
 
@@ -19,38 +32,49 @@ def should_collect(
     exit_cost: int | None,
     state: dict,
 ) -> bool:
-    """Return True only when collecting is valuable and a safe exit remains.
+    """You are standing on an uncollected treasure. Return True to COLLECT.
 
-    Inputs prepared by the fixed adapter:
-    - ``treasure.value``: revealed value because the agent is on the T cell
-    - ``exit_cost``: minimum known energy from here to E, or None if E is hidden
-    - ``state["observed_values"]``: values seen so far in this run
+    Inputs:
+    - ``treasure.value``: revealed now that you stand on it (never None here)
+    - ``exit_cost``: known energy from here to E, or **None while E is unseen**
+    - ``state["observed_values"]``: every value revealed so far in this run
 
-    Rule template (choose and justify your own threshold/margin):
-        enough_energy = energy >= 1 COLLECT + exit_cost + safety_margin
-        worth_it = value is large enough compared with observed values
-        return enough_energy and worth_it
+    Think in two separate parts:
+    - profit: the move here is already paid; COLLECT costs exactly 1 energy
+      (= 1 point), so the gain is ``value - 1``. Treasures never compete for
+      that energy, so comparing with other values is NOT a reason to skip.
+    - feasibility: afterwards you must still reach E. If ``exit_cost`` is a
+      number, require ``obs.energy - 1 >= exit_cost + SAFETY_MARGIN``. If it
+      is None you cannot know the exit cost: decide (and justify) a reserve.
     """
-    return False  # Safe starter: leave treasures untouched until you add a rule.
+    return False  # starter: never collects
 
 
 # ======================== STUDENT TODO 2 ========================
-def should_continue_exploring(
+def choose_target(
     obs: Observation,
-    frontier: tuple[int, int],
-    cost_to_frontier: int,
-    cost_frontier_to_exit: int,
+    options: tuple[Option, ...],
     state: dict,
-) -> bool:
-    """Decide whether to visit one more frontier instead of exiting now.
+) -> Option | None:
+    """Pick where to go next, or return None to walk to the exit.
 
-    The fixed adapter calls this only after E is known and provides exact costs
-    through currently known cells. A minimal safe rule compares
+    Called every turn (the agent re-plans from the newest observation).
+    ``options`` holds every reachable frontier and seen uncollected treasure,
+    sorted by ``cost_to``; see ``Option`` in policy_helpers.py for the fields.
 
-        cost_to_frontier + cost_frontier_to_exit + safety_margin
+    - While E is unseen, returning None means "let the fixed rule pick the
+      cheapest frontier". Returning an option lets YOU steer the search
+      (e.g. prefer frontiers with many unknown cells, or a hidden treasure).
+    - Once E is seen, returning None walks straight to E and ends the run.
+      Before choosing an option, check that
+          option.cost_to + option.cost_to_exit + SAFETY_MARGIN <= obs.energy
+      because nothing else will stop you from running out of energy.
 
-    with ``obs.energy``. Stronger rules may also use observed treasure values,
-    remaining frontiers, or a larger risk margin. Do not use map names, fixed
-    coordinates, dimensions, seeds, or memorized practice layouts.
+    A strong policy estimates, for each option, the expected points gained
+    minus the EXTRA energy compared with leaving now:
+        extra = option.cost_to + option.cost_to_exit - exit_cost(obs)
+    The expected value of a hidden treasure or of an unexplored area has to be
+    estimated from what this run has observed so far. The private maps come
+    from the generator described in treasure_explorer/generator.py.
     """
-    return False  # Safe starter: exit immediately after the exit is discovered.
+    return None  # starter: cheapest frontier until E is seen, then exit

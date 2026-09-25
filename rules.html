@@ -34,7 +34,7 @@
         <li><span class="en">PowerShell: <code>Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }</code></span><span class="ko">PowerShell: <code>Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }</code></span></li>
         <li><span class="en">Bash/macOS: <code>for map in maps/*.json; do python -m treasure_explorer --map "$map" --agent agent.py; done</code></span><span class="ko">Bash/macOS: <code>for map in maps/*.json; do python -m treasure_explorer --map "$map" --agent agent.py; done</code></span></li>
         <li><span class="en">Tests: <code>python -m unittest discover -s tests -v</code></span><span class="ko">테스트: <code>python -m unittest discover -s tests -v</code></span></li>
-        <li><span class="en">Each command starts a fresh run; the same unchanged <code>agent.py</code> is loaded for every map.</span><span class="ko">각 명령은 새 실행을 시작하며, 동일한 <code>agent.py</code>가 모든 맵에 로드됩니다.</span></li>
+        <li><span class="en">Each command starts a fresh run; the fixed <code>agent.py</code> loads your unchanged <code>student_policy.py</code> for every map.</span><span class="ko">각 명령은 새 실행을 시작하며, 고정 <code>agent.py</code>가 수정 없는 동일한 <code>student_policy.py</code>를 모든 맵에 불러옵니다.</span></li>
       </ul>
     </div>
   </div>
@@ -76,6 +76,8 @@
         <li><span class="en"><code>COLLECT</code> while standing on an uncollected treasure</span><span class="ko">미수집 보물 위에서 <code>COLLECT</code></span></li>
         <li><span class="en">Cost is charged when entering a cell: normal, start, exit, and treasure 1; mud 4; water 7.</span><span class="ko">셀에 진입할 때 비용이 부과됩니다: 일반·시작·출구·보물 1, 진흙 4, 물 7.</span></li>
         <li><span class="en"><code>COLLECT</code> costs 1. Week 1 maps contain only unit-cost terrain.</span><span class="ko"><code>COLLECT</code>는 에너지 1을 소비합니다. 1주차 맵은 단위 비용 지형만 포함합니다.</span></li>
+        <li><span class="en">Reaching 0 energy on any cell other than the exit ends the run immediately with score 0.</span><span class="ko">출구가 아닌 칸에서 에너지가 0이 되면 실행이 즉시 끝나고 0점입니다.</span></li>
+        <li><span class="en">Remaining energy is part of the score, so a treasure is worth its value minus the extra energy it costs.</span><span class="ko">남은 에너지가 점수에 포함되므로, 보물의 순이익은 가치에서 그 보물 때문에 추가로 쓴 에너지를 뺀 값입니다.</span></li>
       </ul>
     </div>
     <div>
@@ -148,7 +150,7 @@
     <div>
       <h3><span class="en">One generic agent</span><span class="ko">하나의 범용 에이전트</span></h3>
       <ul>
-        <li><span class="en">Submit the root-level <code>agent.py</code> included in each released stage ZIP.</span><span class="ko">배포된 단계 ZIP에 포함된 루트 레벨 <code>agent.py</code>를 제출하세요.</span></li>
+        <li><span class="en">Run with <code>--agent agent.py</code>, but edit and submit only <code>student_policy.py</code> from the released stage package.</span><span class="ko">실행은 <code>--agent agent.py</code>로 하지만, 수정·제출하는 파일은 배포된 단계 패키지의 <code>student_policy.py</code> 하나입니다.</span></li>
         <li><span class="en">The evaluator loads that same file independently for every map in the stage.</span><span class="ko">평가기는 단계의 모든 맵에 대해 동일한 파일을 독립적으로 로드합니다.</span></li>
         <li><span class="en">Do not branch on filenames, titles, seeds, dimensions used as fingerprints, or memorized layouts.</span><span class="ko">파일 이름, 제목, 시드, 지문으로 사용되는 크기, 또는 기억된 레이아웃으로 분기하지 마세요.</span></li>
         <li><span class="en">Using observed grid dimensions and contents as ordinary algorithm inputs is allowed.</span><span class="ko">관측된 격자 크기와 내용을 일반적인 알고리즘 입력으로 사용하는 것은 허용됩니다.</span></li>
@@ -157,10 +159,11 @@
     <div>
       <h3><span class="en">Submission boundary</span><span class="ko">제출 범위</span></h3>
       <ul>
-        <li><span class="en">Modify and submit <code>agent.py</code> only unless a stage page explicitly requests a report.</span><span class="ko">단계 페이지에서 보고서를 명시적으로 요청하지 않는 한 <code>agent.py</code>만 수정하여 제출하세요.</span></li>
+        <li><span class="en">Submit <code>student_policy.py</code> plus the design note each stage README asks for. Never modify <code>agent.py</code> or <code>policy_helpers.py</code>.</span><span class="ko"><code>student_policy.py</code>와 각 단계 README가 요구하는 설계 노트를 제출하세요. <code>agent.py</code>와 <code>policy_helpers.py</code>는 수정하지 마세요.</span></li>
+        <li><span class="en">Provided reference search functions are fallbacks, not solutions. In Week 1 Tuesday a submission that runs only on <code>reference_bfs_path</code> (<code>USE_MY_BFS = False</code>, or a <code>bfs_path</code> that just calls it) loses 20 points.</span><span class="ko">제공되는 참고 탐색 함수는 대체용이지 풀이가 아닙니다. 1주차 화요일에서 <code>reference_bfs_path</code>로만 실행되는 제출(<code>USE_MY_BFS = False</code>, 또는 그것을 그대로 호출하는 <code>bfs_path</code>)은 20점 감점입니다.</span></li>
         <li><span class="en">Do not modify the engine, maps, runner, tests, or configuration; evaluation uses clean official copies.</span><span class="ko">엔진, 맵, 러너, 테스트, 설정은 수정하지 마세요. 평가는 공식 원본을 사용합니다.</span></li>
         <li><span class="en">Use Python 3.11+ and the standard library only unless a stage explicitly states otherwise.</span><span class="ko">단계에서 명시하지 않는 한 Python 3.11+ 표준 라이브러리만 사용하세요.</span></li>
-        <li><span class="en">Week 2 and Week 3 artifacts, exact filenames, and stage-specific limits are announced when those stages unlock.</span><span class="ko">2주차·3주차 산출물, 파일 이름, 단계별 제한은 해당 단계가 공개될 때 발표됩니다.</span></li>
+        <li><span class="en">Each stage README lists its deliverables, input limits (treasures, grid size, energy), time limit and rubric.</span><span class="ko">단계별 제출물, 입력 상한(보물 수·격자 크기·에너지), 시간 제한, 채점표는 각 단계 README에 있습니다.</span></li>
       </ul>
     </div>
   </div>
@@ -173,7 +176,7 @@
     <div>
       <h3><span class="en">Runtime contract</span><span class="ko">런타임 계약</span></h3>
       <ul>
-        <li><span class="en">The public Week 1 runner has a maximum of 500 turns and no separate per-action timer.</span><span class="ko">공개 1주차 러너는 최대 500 턴이며 별도의 행동별 타이머가 없습니다.</span></li>
+        <li><span class="en">Every run has a maximum of 500 turns. Thursday planners have a per-map planning limit (Week 1: 2 s, Week 2: 5 s) measured by the tests.</span><span class="ko">모든 실행은 최대 500턴입니다. 목요일 계획 함수에는 맵당 계획 시간 제한(1주차 2초, 2주차 5초)이 있으며 테스트가 측정합니다.</span></li>
         <li><span class="en">Infinite loops or an uncaught exception can terminate or invalidate a run.</span><span class="ko">무한 루프나 처리되지 않은 예외는 실행을 종료하거나 무효화할 수 있습니다.</span></li>
         <li><span class="en">Any later per-action, total-runtime, or memory limit must be stated on that stage page before release.</span><span class="ko">이후 행동별·전체 런타임·메모리 제한은 해당 단계 페이지에서 배포 전에 명시됩니다.</span></li>
         <li><span class="en">Viewer delay is display time and is not part of algorithm performance.</span><span class="ko">뷰어 지연은 표시 시간이며 알고리즘 성능에 포함되지 않습니다.</span></li>
@@ -185,7 +188,7 @@
         <li><span class="en">Per-map score: <code>50 + collected treasure + remaining energy - 5 × invalid actions</code>, only after reaching the exit</span><span class="ko">맵별 점수: <code>50 + 수집한 보물 + 남은 에너지 - 5 × 무효 행동</code> (출구 도달 후에만)</span></li>
         <li><span class="en">Exit rate and invalid-action count across the stage map set</span><span class="ko">단계 맵 세트 전체의 출구 도달률 및 무효 행동 횟수</span></li>
         <li><span class="en">Runtime, code quality, and required design explanation</span><span class="ko">런타임, 코드 품질, 필수 설계 설명</span></li>
-        <li><span class="en">Week 3 Thursday may add unseen hidden-seed maps under its published evaluation contract.</span><span class="ko">3주차 목요일은 공개된 평가 계약에 따라 미공개 숨겨진 시드 맵이 추가될 수 있습니다.</span></li>
+        <li><span class="en">The Week 3 final is evaluated on unpublished seeds of the public generator plus hand-made maps with the same rules. Week 3 Thursday is presentations only.</span><span class="ko">3주차 최종 과제는 공개 생성기의 미공개 시드와 같은 규칙의 수작업 맵으로 평가합니다. 3주차 목요일은 발표만 진행합니다.</span></li>
       </ul>
     </div>
   </div>

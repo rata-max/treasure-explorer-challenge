@@ -1,75 +1,49 @@
-# Student guide: three-hour Tuesday integrated hidden final
+# Student guide: Week 3 partial-observation final
 
-This package follows Week 2 Thursday and completes all coding in one three-hour
-Tuesday session. Thursday is presentation-only. The fixed adapter provides the
-fog/frontier/replanning mechanics; students edit and submit only
-`student_policy.py`.
+The task, grading and schedule are in `README.md` (Korean). This guide lists the
+concepts and the common mistakes. All code is written, tested and submitted in the
+three-hour Tuesday session; Thursday is presentations only.
 
-## Practice file versus agent observation
+## File versus Observation
 
-`robustness_practice.json` is a public debugging file. Its raw JSON necessarily
-contains the complete grid and actual treasure values so the local engine can
-run. A student who opens the file can see that ground truth.
+Map files (and generator output) contain the ground truth because the engine needs
+it. The `Observation` your code receives is masked: unseen cells are `?` (never
+assume they are floor), unreached treasure values are `None`, and `exit_position`
+is `None` until E is seen. With `reveal_radius` 1 every step reveals the cells at
+Manhattan distance 1.
 
-The `Observation` passed to the agent is different: unseen terrain is `?`, an
-unreached treasure value is `None`, and the exit is `None` until revealed.
-Therefore the public practice map simulates the partial-observation API; it is
-not a secret file. Real hidden-map evaluation uses private map files that are
-not distributed to students.
+## Terms
 
-## File boundary
+- **frontier**: a *known walkable* cell next to at least one `?` (not the unknown cell).
+- **cost_to_exit**: one-way energy from the option to E (not a round trip back here).
+- **extra energy**: `cost_to + cost_to_exit − exit_cost(obs)`, i.e. how many points
+  visiting the option costs compared with leaving now.
 
-| File/folder | Editable? | Purpose |
-|---|---|---|
-| `student_policy.py` | **Yes** | Two policy decisions and student constants/helpers |
-| `agent.py` | **No** | Viewer adapter, state, frontiers, Dijkstra, replanning |
-| `policy_helpers.py` | **No** | Known-map route and frontier helpers |
-| `treasure_explorer/` | No | Engine, model, runner, viewer |
-| `maps/`, `tests/` | No | One public practice map and contract tests |
+## Common mistakes
 
-## Provided infrastructure
+1. Computing `1 + exit_cost + margin` when `exit_cost is None` (TypeError).
+2. Skipping a treasure because it is below the average: standing on it, COLLECT
+   costs 1, so any value above 1 is profit if the exit stays affordable.
+3. Picking an option after E is known without checking the way back. The fixed code
+   will not stop you.
+4. Switching goals every turn and oscillating. Remember the goal in `state`.
+5. Tuning constants on one public map. Use `evaluate.py` with separate tuning and
+   reporting seed ranges.
+6. Using `grid[r][c] == "T"` as the collected flag. Use `TreasureInfo.collected`.
 
-The fixed code maintains per-run state, distinguishes `?` from known terrain,
-selects reachable frontiers, routes with Dijkstra, replans from each observation,
-avoids crossing the terminal exit while exploring, and preserves state across
-the non-moving COLLECT turn.
+## The safety margin is a heuristic
 
-## Student TODOs
+It is energy you promise not to spend; it does not guarantee an exit. Once E is known
+the known-map cost is exact, so a small margin suffices. Before E is known any reserve
+is an estimate. Justify it in the design note.
 
-1. `should_collect`: compare revealed value, the 1-energy collection cost,
-   known exit cost, and a safety margin.
-2. `should_continue_exploring`: compare the supplied frontier travel/return
-   costs with remaining energy and expected benefit.
+## Public practice guarantees
 
-The starter exits safely after finding the exit and collects nothing. Improve
-its score without sacrificing generality or exit safety.
+Public maps and public seeds use the **same rules and parameter ranges** as the private
+evaluation. They do not reveal private layouts, exits or values.
 
-## 180-minute schedule
+## Rules
 
-| Time | Activity |
-|---|---|
-| 0–20 | Instructor demo: fog, frontier, hidden values |
-| 20–35 | Run starter and tests |
-| 35–70 | Implement `should_collect` |
-| 70–80 | Break |
-| 80–125 | Implement `should_continue_exploring` |
-| 125–155 | Test and tune on the public map |
-| 155–175 | Record results and explain decisions |
-| 175–180 | Submit `student_policy.py` |
-
-Do not continue coding on Thursday; present the submitted Tuesday policy and
-its results.
-
-## Evaluation boundary
-
-- Public: `maps/robustness_practice.json`
-- Private: hidden-value maps and additional private seeds
-- The exact same `student_policy.py` runs on every map.
-- Standard library only. No PyTorch, NumPy, learned models, external packages,
-  map fingerprints, hardcoded coordinates, files, network, subprocesses,
-  reflection, side channels, or cross-run memory.
-
-```powershell
-python -m treasure_explorer --map maps/robustness_practice.json --agent agent.py --view
-python -m unittest discover -s tests -v
-```
+Python 3.11+ standard library only; no external packages, learned models, file,
+network, subprocess or reflection access; no branching on map names, coordinates,
+sizes, shapes or seeds; no state shared between evaluation runs.

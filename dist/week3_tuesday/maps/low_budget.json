@@ -1,0 +1,76 @@
+{
+  "title": "Low Budget, Far Exit",
+  "energy": 235,
+  "visibility": "local",
+  "reveal_radius": 1,
+  "hidden_values": true,
+  "grid": [
+    "#####################",
+    "#.M.T...TM.WTE#..W#.#",
+    "#.###.#T#.#####W#.#.#",
+    "#T..T.#.W.#SM.T.#.#.#",
+    "#.###.#####.##.####.#",
+    "#.M.W.....M.#.W..W#.#",
+    "###M#M#######.#.#.#.#",
+    "#........TMM.W#.M.M.#",
+    "#####################"
+  ],
+  "treasures": [
+    {
+      "position": [
+        1,
+        12
+      ],
+      "value": 12
+    },
+    {
+      "position": [
+        7,
+        9
+      ],
+      "value": 36
+    },
+    {
+      "position": [
+        2,
+        7
+      ],
+      "value": 15
+    },
+    {
+      "position": [
+        3,
+        4
+      ],
+      "value": 18
+    },
+    {
+      "position": [
+        1,
+        4
+      ],
+      "value": 29
+    },
+    {
+      "position": [
+        3,
+        1
+      ],
+      "value": 13
+    },
+    {
+      "position": [
+        3,
+        14
+      ],
+      "value": 29
+    },
+    {
+      "position": [
+        1,
+        8
+      ],
+      "value": 1
+    }
+  ]
+}

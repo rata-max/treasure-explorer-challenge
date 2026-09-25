@@ -1,72 +1,123 @@
-# Week 3 Tuesday — Three-Hour Integrated Hidden Final
+# Week 3 Tuesday — 부분 관측 최종 과제 (탐색 전략 설계와 실험)
 
-한국어 공통 안내: `STUDENT_GUIDE_KO.md`
+난이도 ★★★★★ · 화요일 3시간 구현·제출, 목요일은 발표만(새 코드 없음) · 공통 안내: `STUDENT_GUIDE_KO.md`
 
-목요일을 발표에 사용하기 위해 화요일 3시간 안에 구현·테스트·제출을
-완료하는 통합형 최종 과제입니다. 부분 관측 탐색의 구현은 고정 `agent.py`에
-제공되고, 학생은 hidden value와 안전한 추가 탐색에 관한 두 규칙만 설계합니다.
+**선수지식:** 1–2주차 전체. 기댓값, 표본 평균, 실험의 훈련/검증 분리 개념.
+지도는 안개(`?`)에 덮여 있고, 보물 가치는 도착해야 보이며, 출구 위치도 처음에는 모릅니다.
+이번에는 **어디로 갈지 직접 고릅니다.** 출구를 찾기 전의 탐색 방향도 여러분이 정합니다.
+정답이 하나로 정해진 문제가 아니므로, 설계하고 **실험으로 근거를 대는 것**이 과제의 핵심입니다.
 
-## Start here
+## 1. 수정 범위
 
-1. `STUDENT_GUIDE_KO.md`에서 제공 기능과 TODO 경계를 읽습니다.
-2. 공개 맵 `robustness_practice.json`을 viewer로 한 번 실행합니다.
-3. `student_policy.py`의 `should_collect`를 구현합니다.
-4. `should_continue_exploring`을 구현하고 안전 여유를 조정합니다.
-5. 테스트와 공개 맵 점수를 확인한 뒤 `student_policy.py`만 제출합니다.
+| 파일 | 수정 | 역할 |
+|---|---|---|
+| `student_policy.py` | **수정·제출** | TODO 1·2, 상수, 보조 함수 |
+| `agent.py` | 금지 | 상태 유지, 옵션 목록 생성, Dijkstra 이동, COLLECT 처리 |
+| `policy_helpers.py` | 금지 | `Option`, Dijkstra, frontier, `exit_cost` |
+| `evaluate.py`, `treasure_explorer/generator.py` | 금지 | 일괄 평가와 공개 맵 생성기 |
+| `treasure_explorer/`, `maps/`, `tests/` | 금지 | 엔진과 계약 검사 |
 
-## 정확한 수정 범위
+## 2. 고정 코드가 해 주는 것과 해 주지 않는 것
 
-- **수정·제출:** `student_policy.py`의 두 TODO와 학생 설정/보조 함수
-- **수정 금지:** `agent.py`, `policy_helpers.py`, 엔진, 맵, 테스트, viewer
-- 평가는 모든 고정 파일을 깨끗한 공식 사본으로 교체한 뒤 수행합니다.
+해 주는 것:
+- 실행별 상태를 만들고 새 맵에서만 초기화합니다. COLLECT 전후에도 같은 `state`가 유지됩니다.
+- 보물 위에 서면 그 가치를 `state["observed_values"]`에 추가하고 `should_collect`를 부릅니다.
+- 매 턴 도달 가능한 **frontier와 본 적 있는 미수집 보물**로 `Option` 목록을 만들어 `choose_target`에 넘깁니다.
+- 선택한 목표로 Dijkstra 한 걸음을 옮깁니다. 목표가 E가 아니면 E를 지나지 않고, 에너지가 모자란 칸으로는 들어가지 않습니다.
 
-## 3시간 완주를 위해 제공되는 핵심 기능
+해 주지 않는 것:
+- **탈출 보장이 없습니다.** 출구를 찾기 전에 에너지가 바닥나면 0점입니다. `None`을 돌려주면 "가장 가까운 frontier"로 가는 기본 규칙이 쓰이는데, 이 규칙은 공개 생성기 맵의 약 10%에서 출구를 찾기 전에 에너지가 떨어집니다.
+- 출구를 안 뒤 어떤 옵션을 고르든 막지 않습니다. 돌아올 에너지 확인은 여러분의 책임입니다.
 
-- 실행별 상태 생성과 `COLLECT` 전후 상태 유지
-- 누적 관측 및 방문 위치 기록
-- `?`와 알려진 통행 가능 칸 구분
-- frontier 생성과 최저 비용 후보 선택
-- 알려진 영역의 Dijkstra 경로 계산
-- 관측이 갱신될 때마다 온라인 재계획
-- 탐색 중 출구를 경유하지 않도록 하는 보호 장치
-- 출구 발견 전 자동 탐색과 출구까지의 정확한 복귀 비용 제공
+## 3. `Option` (policy_helpers.py)
 
-## 학생 TODO
+| 필드 | 뜻 |
+|---|---|
+| `kind` | `"frontier"`: 알려진 통행 가능 칸 중 `?`와 맞닿은 칸(미지 칸 자체가 아님) / `"treasure"`: 본 적 있는 미수집 보물 |
+| `position` | 목표 칸 |
+| `cost_to` | 현재 → 목표 에너지(알려진 칸만, E 경유 없음) |
+| `cost_to_exit` | 목표 → E 에너지. E를 아직 모르면 `None`. **왕복이 아니라 편도**입니다 |
+| `unknown_nearby` | 목표에서 맨해튼 거리 2 이내의 `?` 칸 수(얼마나 새로 볼 수 있는지의 대략적인 척도) |
+| `value` | 보물 가치(도착 전에는 `None`), frontier는 항상 `None` |
 
-1. `should_collect`: 보물 가치, 수집 비용 1, 출구 비용, 안전 여유를 비교
-2. `should_continue_exploring`: frontier 왕복 비용과 남은 에너지를 비교
+`exit_cost(obs)`는 현재 위치에서 E까지의 알려진 최소 에너지(E를 모르면 `None`)입니다.
 
-frontier 알고리즘 자체는 이 최종 과제의 필수 구현 범위가 아닙니다.
+## 4. TODO
 
-## 화요일 180분 운영안
+### TODO 1 `should_collect(obs, treasure, exit_cost, state)`
+두 부분으로 나눠 생각하세요.
+- **이익:** 이미 보물 위에 있으므로 이동비는 낸 상태입니다. 수집 비용은 1뿐이고 보물끼리 에너지를 다투지 않으므로, `value > 1`이면 이득입니다. "지금까지 본 평균보다 낮다"는 이유로 버리면 점수를 잃습니다.
+- **가능성:** 출구를 알면 `obs.energy − 1 ≥ exit_cost + SAFETY_MARGIN`을 요구합니다.
+  **출구를 모르면(`exit_cost is None`)** 두 가지 선택지가 있습니다. (a) 줍지 않기: 안전하지만 가치를 버림. (b) 일정 예비 에너지가 있을 때만 줍기: 1 에너지 차이로 출구를 못 찾을 위험은 작지만 0은 아님. 어느 쪽이든 근거를 설계 노트에 쓰세요.
+
+### TODO 2 `choose_target(obs, options, state)` → `Option` 또는 `None`
+- **출구를 모를 때:** `None`이면 가장 가까운 frontier로 갑니다. 옵션을 고르면 탐색 방향을 직접 정합니다. 예: `unknown_nearby`가 큰 곳, 가까운 가치 미공개 보물.
+- **출구를 알 때:** `None`이면 곧장 E로 가서 끝납니다. 옵션을 고르기 전에 반드시
+  `option.cost_to + option.cost_to_exit + SAFETY_MARGIN ≤ obs.energy`를 확인하세요.
+- 좋은 규칙의 틀: `기대 이익 − 추가 에너지`, 여기서 `추가 에너지 = cost_to + cost_to_exit − exit_cost(obs)`입니다.
+  가치 미공개 보물의 기대 가치, frontier 뒤에 보물이 있을 확률 등은 **이번 실행에서 관측한 것**으로 추정해야 합니다.
+- 매 턴 다시 호출됩니다. 목표가 흔들리지 않게 하려면 `state`에 현재 목표를 기억하세요.
+
+## 5. 공개 연습과 비공개 평가
+
+| | 내용 |
+|---|---|
+| 공개 맵 5개 | `robustness_practice`(기존), `low_budget`(예산이 빠듯하고 출구가 멂: starter는 0점), `early_exit`(출구를 일찍 발견: 멈추면 손해), `decoys`(가치 1 미끼 2개), `costly_terrain`(진흙·물 다수) |
+| 공개 생성기 | `treasure_explorer/generator.py`: **모든 파라미터 범위가 파일 맨 위에 적혀 있습니다.** 시드는 아무거나 써도 됩니다 |
+| 비공개 평가 | 같은 생성기의 **미공개 시드** + 같은 규칙·범위의 수작업 맵 몇 개. 맵 파일은 배포하지 않습니다 |
+
+JSON 파일에는 정답(전체 지형·가치)이 들어 있지만, 에이전트가 받는 `Observation`에서는 가려집니다.
+파일을 사람이 읽는 것은 디버깅상 괜찮지만, 좌표·가치·시드를 외워 정책에 넣는 것은 금지이며 비공개 맵에서 통하지도 않습니다.
+
+## 6. 실험 방법
+
+```powershell
+python evaluate.py                      # 공개 맵 5개 + 시드 0–49 요약
+python evaluate.py --seeds 100-299      # 다른 범위
+python evaluate.py --csv runs.csv       # 실행별 결과 저장
+```
+
+권장 절차: 상수는 한 시드 범위(예: 100–299)에서 조정하고, **다른 범위(예: 0–99)에서 보고**하세요.
+공개 맵 하나만 보고 조정하면 대부분 일반화되지 않습니다. 참고 구현의 상수 18가지 조합은 시드 평균 점수가 서로 달랐지만(상위 8개만 봐도 250.7–257.4), `robustness_practice` 점수는 모두 175로 같았습니다.
+
+참고 수치(시드 0–29): starter 평균 166.8점, 탈출률 90%. 참고 구현 평균 약 265점, 탈출률 100%.
+**최소 기준(테스트): 평균 200점 이상, 탈출률 90% 이상, 무효 행동 0.**
+
+## 7. 테스트
+
+- `test_student_todo.py`: 수집 판단 경계(가치 1, 여유값 경계, 낮은 가치도 이득), 출구 미확인 시 결정 반환, 돌아올 수 없는 옵션 거절, 공개 맵 5개 완주, 시드 0–29 최소 기준. **starter에서는 일부 실패가 정상**입니다.
+- `test_student_contract.py`, `test_package.py`: 고정 코드와 생성기의 계약입니다. 처음부터 통과합니다.
+
+## 8. 제출물과 채점(100점)
+
+제출물: `student_policy.py`, 설계 노트(두 규칙의 식과 근거, 실험 표, 한계). 목요일 발표 5분.
+
+| 항목 | 점수 |
+|---|---:|
+| 비공개 평가 평균 점수(상대 평가) | 35 |
+| 비공개 평가 탈출률과 무효 행동 | 15 |
+| 실험 설계: 조정/보고 시드 분리, 상수별 비교표, starter 대비 개선 | 20 |
+| 설계 노트와 발표: 규칙의 근거, `exit_cost is None` 처리, 실패 사례 분석 | 20 |
+| 코드 품질(하드코딩 없음, 읽기 쉬운 상수·보조 함수) | 10 |
+
+## 9. 180분 운영안
 
 | 시간 | 활동 |
 |---|---|
-| 0–20분 | fog, frontier, hidden value, 고정 코드 시연 |
-| 20–35분 | starter 실행 및 테스트 확인 |
-| 35–70분 | TODO 1 `should_collect` 구현 |
-| 70–80분 | 휴식 |
-| 80–125분 | TODO 2 `should_continue_exploring` 구현 |
-| 125–155분 | 공개 맵 테스트와 threshold 조정 |
-| 155–175분 | 결과 기록, 판단식 설명, 제출 점검 |
-| 175–180분 | 제출 buffer |
+| 0–20분 | 안개·frontier·Option 시연, starter와 `evaluate.py` 실행 |
+| 20–55분 | TODO 1, 수집 테스트 통과 |
+| 55–100분 | TODO 2 출구 확인 후 규칙(안전 조건 + 기대 이익) |
+| 100–110분 | 휴식 |
+| 110–145분 | TODO 2 출구 확인 전 탐색 방향 |
+| 145–170분 | 시드 범위를 나눠 상수 조정, 실험 표 작성 |
+| 170–180분 | 제출 점검 |
 
-목요일에는 새 코드 활동 없이 화요일에 완성한 정책과 결과를 발표합니다.
+## 10. 제출 전 체크리스트
 
-## 공개·비공개 평가
+- 수정한 파일이 `student_policy.py` 하나인가?
+- 출구를 알 때 돌아올 에너지와 수집 비용 1을 확인하는가? `exit_cost is None`일 때의 처리를 설명할 수 있는가?
+- `?`를 통행 가능한 바닥으로 가정하지 않았는가?
+- 맵 이름·좌표·크기·시드에 의존하지 않는가?
+- 조정에 쓰지 않은 시드 범위의 결과를 보고했는가?
 
-- 공개 연습: `maps/robustness_practice.json` 한 개. 이 JSON은 로컬 실행에
-  필요한 ground truth이므로 파일을 열면 전체 grid와 실제 value가 보입니다.
-- 공개 맵을 실행할 때 agent가 받는 `Observation`은 별개입니다.
-  `visibility: local`이 지형을 `?`로, `hidden_values: true`가 T 도착 전
-  value를 `None`으로 가립니다.
-- 비공개 평가: hidden-value 맵과 추가 private seed
-- 실제 Hidden 평가는 map 파일 자체를 학생에게 배포하지 않습니다.
-- 공개·비공개 모두 동일한 `student_policy.py`를 수정 없이 실행
-- 맵 이름, 좌표, 크기, 모양, seed를 이용한 식별 또는 하드코딩 금지
-
-```powershell
-python -m treasure_explorer --map maps/robustness_practice.json --agent agent.py --view
-python -m treasure_explorer --map maps/robustness_practice.json --agent agent.py
-python -m unittest discover -s tests -v
-```
+허용: Python 3.11+ 표준 라이브러리. 금지: 외부 패키지·학습된 모델, 파일·네트워크·subprocess·리플렉션, 실행 간 정보 공유.

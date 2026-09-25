@@ -1,3 +1,9 @@
+"""The provided files must stay identical to the released copies.
+
+Line endings are normalised before hashing, so a Windows checkout with CRLF
+line endings still passes. Evaluation always uses clean official copies.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -7,18 +13,23 @@ from pathlib import Path
 
 EXPECTED = {
     "agent.py": "5a4f94114db5fb154416efb7aeaa1a487ac0b0b83067372dda9d4e5468abe55d",
-    "policy_helpers.py": "0314d6fded77b9503b752ab13cc0042666ff1bca6eb8d57ab932ba32dd56c7a8",
+    "policy_helpers.py": "05bcc25175abb0b9c6030e29d8c59099f2be7a6758a729b5ffb1f48fdbc0f399",
+    "treasure_explorer/engine.py": "2bbdf5c01689aef09c1dab2a9eb6efa363ddb4b848413b3a469c093037a672fb",
+    "treasure_explorer/runner.py": "c0b916ef97fc5b0891708a9b0a49aa136a79d6478807cbe1b46c4d4503a8a9a7",
 }
+
+
+def normalised_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 class FixedFileTests(unittest.TestCase):
     def test_provided_files_are_unchanged(self):
         root = Path(__file__).parents[1]
         for name, expected in EXPECTED.items():
-            actual = hashlib.sha256((root / name).read_bytes()).hexdigest()
             self.assertEqual(
                 expected,
-                actual,
+                normalised_sha256(root / name),
                 f"{name} is fixed; restore it and edit only student_policy.py",
             )
 

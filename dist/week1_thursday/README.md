@@ -1,48 +1,114 @@
-# Week 1 Thursday — Global Tree Optimization
+# Week 1 Thursday — 전역 트리 최적화 (부분집합 탐색)
 
-한국어 공통 안내: `STUDENT_GUIDE_KO.md`
+난이도 ★★★☆☆ · 3시간 실습 · 공통 안내: `STUDENT_GUIDE_KO.md` / `STUDENT_GUIDE.md`
 
-## Start here
+**선수지식:** 화요일 과제(BFS, 순이익 = 가치 − 추가 에너지), 재귀 또는 비트마스크 기초.
+화요일의 "보물 하나씩 보기"로는 풀 수 없는 맵들입니다. **어떤 보물들을, 어떤 순서로** 방문할지 한 번에 정해야 합니다.
 
-1. Run the tests and the safe starter.
-2. Read `STUDENT_GUIDE.md`.
-3. Edit only `student_policy.py`, beginning with `plan_targets`.
-4. Compare complete route scores across all five maps.
+## 1. 수정 범위와 제공 코드
 
-## File boundary
+- **수정·제출:** `student_policy.py` (TODO 1 `plan_targets`, TODO 2 `should_collect`)
+- **제공:** `policy_helpers.py`의 `bfs_path`(화요일과 같은 계약: `[]`=도착, `None`=도달 불가), `route_to`, `route_length`(목표가 E가 아니면 E를 지나지 않는 경로)
+- **수정 금지:** `agent.py`, `policy_helpers.py`, 엔진, 맵, 테스트
 
-- **Edit and submit:** `student_policy.py`
-- **Fixed:** `agent.py` (viewer/evaluator and state lifecycle)
-- **Provided helper:** `policy_helpers.py` (BFS and path reconstruction)
-- **Never edit:** engine, viewer, runner, maps, and tests
+`plan_targets`는 **첫 턴에 한 번만** 호출됩니다. 반환한 계획은 COLLECT 턴에도 유지되고, 제공 orchestration이 도착한 목표를 하나씩 지우며 따라갑니다.
 
-`plan` persists across movement and collection turns. When the agent collects on
-`T`, the fixed wrapper does not clear the list. On the next call, the provided
-orchestration removes the completed target and continues to the next one.
+## 2. 목적함수
 
-## Your TODOs
+```
+점수 = 50 + obs.energy + Σ(수집한 가치) − energy(계획)
+energy(계획) = d(S,t1) + 1 + d(t1,t2) + 1 + … + d(tk,E),  제약: energy(계획) ≤ obs.energy
+```
 
-1. `plan_targets`: return selected treasures in visit order and append the exit.
-2. `should_collect`: normally collect only the next planned treasure.
+`d`는 `route_length`입니다. 공유 분기는 "보물마다 따로 왕복"이 아니라 **실제로 걷는 경로 길이**로 계산해야 합니다.
 
-Evaluate `start -> selected treasures -> exit` as one expedition. Branches can
-share edges, so independent treasure round trips give the wrong cost.
+## 3. 풀이 예시: 상태 = (방문한 보물 집합, 마지막 보물)
 
-## Search policy
+```
+#########
+#S.....E#      S→E 직행 6
+####.####      줄기 4칸 아래에 보물 A, B (각 가치 8)
+####.####
+####.####
+###A.B###
+#########
+```
 
-- Required: global treasure subset and visit-order reasoning.
-- Allowed: exact enumeration, tree DP, subset DP, branch-and-bound, or a justified
-  heuristic. BFS/DFS may be used for pairwise tree paths.
-- Forbidden: map fingerprints/hardcoding, PyTorch/NumPy/external packages, file or
-  network access, subprocesses, and learned models.
+| 거리 | 값 |
+|---|---:|
+| d(S,A) = d(S,B) | 8 |
+| d(A,B) | 2 |
+| d(A,E) = d(B,E) | 8 |
 
-## Maps
+| 상태 `dp[집합][마지막]` = 최소 에너지(수집 포함) | 계산 | 값 |
+|---|---|---:|
+| `dp[{A}][A]` | d(S,A) + 1 | 9 |
+| `dp[{A,B}][B]` | dp[{A}][A] + d(A,B) + 1 | 12 |
 
-`shared_branch.json`, `value_trap.json`, `subset_order.json`, `large_tree.json`,
-and `challenge.json`.
+| 마지막 선택 | 총 에너지 | 순이익 = 가치 − 에너지 |
+|---|---:|---:|
+| 바로 탈출 | 6 | −6 |
+| A만 | 9 + 8 = 17 | 8 − 17 = −9 |
+| A와 B | 12 + 8 = 20 | 16 − 20 = **−4** (최선) |
+
+A 하나만 보면 추가 비용 17 − 6 = 11이 가치 8보다 커서 버리게 됩니다. 하지만 **둘을 함께 가면 추가 비용이 14로 가치 합 16보다 작습니다.**
+`dp[mask][i]`에서 `j`로 넘어가는 전이는 `dp[mask | 1<<j][j] = min(…, dp[mask][i] + d(i,j) + 1)`이고, 부모 포인터로 순서를 복원합니다.
+이 상태 설계는 `tests/test_student_todo.py`의 `STEM` 테스트와 같습니다.
+
+## 4. 요구 수준과 제한
+
+- **정확한 해(최적 점수)** 가 필수입니다. 8개 공개 맵 모두 테스트가 최적 점수를 확인합니다.
+- 허용 방법: 예산 가지치기를 한 순서 탐색(DFS), 부분집합 DP(Held-Karp), branch-and-bound.
+- **입력 상한:** 보물 ≤ 12, 격자 ≤ 13×31, 에너지 ≤ 500, 최대 500턴.
+- **시간 제한:** `plan_targets` 한 번에 **2초**(테스트가 측정). 12개 보물의 모든 순열(12! ≈ 4.8억 개)을 `itertools.permutations`로 다 보면 시간 안에 끝나지 않습니다.
+  예산을 넘는 순서를 즉시 버리거나 DP를 쓰세요. 참고 구현(DP)은 0.5초 안팎입니다.
+- 휴리스틱만 쓴 풀이는 최적 점수 항목을 받지 못합니다(설계 노트 비교용으로는 권장).
+
+## 5. 맵
+
+| 맵 | 보물 | 무엇을 시험하나 | 최적 점수 |
+|---|---:|---|---:|
+| `shared_branch.json` | 2 | 공유 분기 비용 | 89 |
+| `value_trap.json` | 2 | 최고가 우선의 함정 | 101 |
+| `subset_order.json` | 3 | 부분집합과 순서 | 112 |
+| `large_tree.json` | 4 | 여러 분기 | 136 |
+| `challenge.json` | 5 | 종합 | 142 |
+| `nearest_trap.json` | 6 | 최근접 우선·비율 탐욕이 크게 실패 | 146 |
+| `budget_cut.json` | 6 | 예산 때문에 6개 중 2개만 가능 | 118 |
+| `many_treasures.json` | 12 | 규모: 순열 전수조사 불가 | 292 |
+
+## 6. 테스트
+
+- `test_student_todo.py`: STEM 예시(짝으로 가져가기, 에너지 1 부족 시 포기), 8개 맵 최적 점수, 2초 제한. **starter에서는 실패가 정상**입니다.
+- 나머지 테스트는 환경·계약 확인입니다.
+
+## 7. 제출물과 채점(100점)
+
+제출물: `student_policy.py`, 설계 노트(상태·전이·시간복잡도 O(2^k·k²), 탐욕 반례 1개를 실제 맵 숫자로 설명, 8개 맵 점수·계획 시간 표).
+
+| 항목 | 점수 |
+|---|---:|
+| 정확한 방법의 설계와 구현(상태·전이·복원) | 30 |
+| 8개 맵 최적 점수 | 25 |
+| 시간 제한 준수 | 10 |
+| 탐욕 반례 설명(최근접·최고가·비율 중 하나 이상) | 20 |
+| 설계 노트(복잡도, 점수·시간표) | 15 |
+
+## 8. 3시간 운영안
+
+| 시간 | 활동 |
+|---|---|
+| 0–25분 | 목적함수와 위 예시 표를 손으로 계산 |
+| 25–70분 | 쌍별 거리표 + 예산 가지치기 DFS로 첫 정답 |
+| 70–80분 | 휴식 |
+| 80–130분 | `many_treasures`의 시간 문제 → DP 또는 더 강한 가지치기 |
+| 130–160분 | 탐욕 규칙과 비교해 반례 찾기 |
+| 160–180분 | 설계 노트, 제출 점검 |
 
 ```powershell
 python -m treasure_explorer --map maps/shared_branch.json --agent agent.py --view
 Get-ChildItem maps/*.json | ForEach-Object { python -m treasure_explorer --map $_.FullName --agent agent.py }
 python -m unittest discover -s tests -v
 ```
+
+허용: Python 3.11+ 표준 라이브러리. 금지: 맵 이름·좌표·레이아웃 하드코딩, 외부 패키지, 파일·네트워크·subprocess 접근.
