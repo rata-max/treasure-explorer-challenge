@@ -28,11 +28,11 @@ window.SITE_CONTENT = {
     ["02:40","Report","Design note and submission check."]
   ],
   rubric: [
-    ["25–30","Algorithm","The stage's own algorithm: BFS, subset search, Dijkstra, budgeted DP, exploration strategy"],
-    ["20–25","Score","Required level, exact optimum, or private evaluation, depending on the stage"],
-    ["10–20","Safety","Exit on every map, 0 invalid actions, planning time limit"],
-    ["15–20","Analysis","Greedy counterexample, BFS vs Dijkstra table, ablation, or seed experiments"],
-    ["10–15","Design note","Complexity, decisions and their limits. Exact rubric: each stage README"]
+    ["W1 TUE","Own BFS 20 · Rules 30 · Exits 20 · Score 15 · Note 15","Running only on reference_bfs_path (USE_MY_BFS = False) loses the 20 BFS points"],
+    ["W1 THU","Exact method 30 · Optimum 25 · Time 10 · Counterexample 20 · Note 15","Exact optimum on 8 maps, 2 s per map"],
+    ["W2 TUE","Own Dijkstra 30 · Rules 20 · Required scores 20 · BFS vs Dijkstra 15 · Note 15","Hop-count BFS scores 0 on energy_illusion"],
+    ["W2 THU","Exact method 30 · Optimum 20 · Time 10 · Ablation 20 · Stress maps 10 · Note 10","5 s public, 10 s on two private 16–18-treasure maps"],
+    ["W3 TUE","Private score 35 · Exit & invalid 15 · Experiments 20 · Note & talk 20 · Code 10","Unpublished generator seeds; Thursday is presentations only"]
   ],
   submissionRules: [
     "Run with --agent agent.py, but edit and submit only student_policy.py (plus the design note).",
@@ -112,11 +112,11 @@ window.SITE_CONTENT_KO = {
     ["02:40","보고","설계 노트 작성과 제출 점검."]
   ],
   rubric: [
-    ["25–30","알고리즘","단계 고유 알고리즘: BFS, 부분집합 탐색, Dijkstra, 예산 DP, 탐색 전략"],
-    ["20–25","점수","단계에 따라 필수 수준, 정확한 최적, 비공개 평가"],
-    ["10–20","안전","모든 맵 탈출, 무효 행동 0, 계획 시간 제한"],
-    ["15–20","분석","탐욕 반례, BFS 대 Dijkstra 표, ablation, 시드 실험"],
-    ["10–15","설계 노트","복잡도, 판단과 한계. 정확한 채점표는 각 단계 README"]
+    ["1주 화","직접 작성한 BFS 20 · 판단 규칙 30 · 완주 20 · 점수 15 · 설계 노트 15","참고 BFS로만 실행되는 제출(USE_MY_BFS = False)은 BFS 20점 감점"],
+    ["1주 목","정확한 방법 30 · 최적 점수 25 · 시간 10 · 탐욕 반례 20 · 설계 노트 15","8개 맵 정확한 최적, 맵당 2초"],
+    ["2주 화","직접 작성한 Dijkstra 30 · 판단 규칙 20 · 필수 점수 20 · BFS 대 Dijkstra 15 · 설계 노트 15","이동 횟수 BFS는 energy_illusion에서 0점"],
+    ["2주 목","정확한 방법 30 · 최적 점수 20 · 시간 10 · Ablation 20 · 스트레스 맵 10 · 설계 노트 10","공개 5초, 보물 16–18개 비공개 맵 2개는 10초"],
+    ["3주 화","비공개 점수 35 · 탈출·무효 행동 15 · 실험 20 · 설계 노트·발표 20 · 코드 10","공개 생성기의 미공개 시드로 평가, 목요일은 발표만"]
   ],
   submissionRules: [
     "실행은 --agent agent.py로 하지만, 수정·제출하는 파일은 student_policy.py(와 설계 노트)뿐입니다.",
