@@ -1,1 +1,4 @@
-/dist/*  404
+# Unreleased assignment packages live in dist/ for the TA workflow only.
+# The trailing "!" forces the rule even though the files exist; without it
+# Netlify serves the real files and this block has no effect.
+/dist/*  /404.html  404!
