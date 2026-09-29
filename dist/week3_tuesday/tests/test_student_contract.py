@@ -71,6 +71,19 @@ class StudentContractTests(unittest.TestCase):
         self.assertEqual(1, treasure.cost_to_exit)    # one step down into E
         self.assertIsNone(treasure.value)
 
+    def test_revealed_decoy_is_not_an_option(self):
+        agent = load_fixed_agent()
+        grid = ("S.T.E",)
+
+        def treasure_options(value):
+            obs = Observation(3, (0, 0), (0, 4), 20, grid, (TreasureInfo((0, 2), value, False),))
+            agent._new_run_state()
+            return [o for o in agent.build_options(obs) if o.kind == "treasure"]
+
+        self.assertEqual([], treasure_options(1))          # value 1: collecting gains nothing
+        self.assertEqual([None], [o.value for o in treasure_options(None)])  # not reached yet
+        self.assertEqual([5], [o.value for o in treasure_options(5)])        # seen, not collected
+
     def test_foreign_option_is_rejected(self):
         agent = load_fixed_agent()
         from policy_helpers import Option

@@ -6,8 +6,9 @@ What this file does for you, every turn:
   1. keeps per-run memory (reset only when a new map starts);
   2. if you stand on an uncollected treasure, reveals its value to
      ``state["observed_values"]`` and asks ``should_collect``;
-  3. builds the list of ``Option``s (frontiers and seen treasures) with exact
-     known-map energy costs, and asks ``choose_target`` which one to head for;
+  3. builds the list of ``Option``s (frontiers and seen treasures, except
+     revealed value-1 decoys) with exact known-map energy costs, and asks
+     ``choose_target`` which one to head for;
   4. takes ONE Dijkstra step toward that target. Routes never cross E unless
      E is the destination, and a step is never taken without enough energy.
 
@@ -71,7 +72,13 @@ def _remember_treasure_value(treasure: TreasureInfo) -> None:
 
 
 def build_options(obs: Observation) -> list[Option]:
-    """All reachable frontiers and seen uncollected treasures, cheapest first."""
+    """All reachable frontiers and seen uncollected treasures, cheapest first.
+
+    A treasure whose value is revealed as 1 (a decoy) is left out: collecting
+    it gains 1 - 1 = 0 points, and keeping it would lure simple "nearest
+    treasure" rules back to it forever. A revealed value above 1 that was not
+    collected stays in the list with its ``value`` filled in.
+    """
     exit_pos = obs.exit_position
     forbidden = () if exit_pos is None else (exit_pos,)
     reach, _ = dijkstra_all(obs, obs.position, forbidden)
@@ -90,6 +97,8 @@ def build_options(obs: Observation) -> list[Option]:
     for t in obs.treasures:
         if t.collected or t.position == obs.position or t.position not in reach:
             continue
+        if t.value is not None and t.value <= 1:
+            continue  # revealed decoy
         options.append(Option("treasure", t.position, reach[t.position],
                               exit_cost_from(t.position), unknown_nearby(obs, t.position), t.value))
     options.sort(key=lambda o: (o.cost_to, o.kind, o.position))

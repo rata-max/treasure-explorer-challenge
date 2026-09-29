@@ -26,6 +26,8 @@ no exit means 0. **Spending less energy is itself score**, so a treasure is wort
 - Entering E ends the run immediately. **A route to a treasure must not cross E.**
 - Reaching 0 energy anywhere except E ends the run with 0. A move without enough
   energy, into a wall, or a COLLECT without treasure is invalid (−5, nothing changes).
+- The run also ends with 0 as soon as no move is possible (every neighbour is a
+  wall or costs more than the energy left): E could never be reached any more.
 - At most 500 turns.
 
 ## Path-function contract (every week)

@@ -101,7 +101,24 @@ class Game:
 
     @property
     def done(self) -> bool:
-        return self.exited or self.energy <= 0 or self.turn >= self.spec.max_turns
+        return (self.exited or self.energy <= 0 or self.turn >= self.spec.max_turns
+                or not self._can_move())
+
+    def _can_move(self) -> bool:
+        """True if some neighbour is inside the map, not a wall and affordable.
+
+        Energy never increases, so without such a move E can never be reached:
+        the run ends at once (score 0) instead of repeating invalid actions
+        until max_turns.
+        """
+        r, c = self.position
+        for dr, dc in MOVE.values():
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < len(self.spec.grid) and 0 <= nc < len(self.spec.grid[0]):
+                tile = self.spec.grid[nr][nc]
+                if tile != "#" and TERRAIN_COST[tile] <= self.energy:
+                    return True
+        return False
 
     def result(self) -> dict:
         treasure = sum(self.spec.treasures[p] for p in self.collected)

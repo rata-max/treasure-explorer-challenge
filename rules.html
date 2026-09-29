@@ -77,6 +77,7 @@
         <li><span class="en">Cost is charged when entering a cell: normal, start, exit, and treasure 1; mud 4; water 7.</span><span class="ko">셀에 진입할 때 비용이 부과됩니다: 일반·시작·출구·보물 1, 진흙 4, 물 7.</span></li>
         <li><span class="en"><code>COLLECT</code> costs 1. Week 1 maps contain only unit-cost terrain.</span><span class="ko"><code>COLLECT</code>는 에너지 1을 소비합니다. 1주차 맵은 단위 비용 지형만 포함합니다.</span></li>
         <li><span class="en">Reaching 0 energy on any cell other than the exit ends the run immediately with score 0.</span><span class="ko">출구가 아닌 칸에서 에너지가 0이 되면 실행이 즉시 끝나고 0점입니다.</span></li>
+        <li><span class="en">The run also ends immediately with score 0 when no move is possible any more: every neighbour is a wall or costs more than the energy left. Energy never increases, so such a run could never reach the exit.</span><span class="ko">더 이상 움직일 수 있는 칸이 없을 때(모든 이웃이 벽이거나 남은 에너지보다 비쌈)도 실행이 즉시 끝나고 0점입니다. 에너지는 늘지 않으므로 이런 실행은 출구에 도달할 수 없습니다.</span></li>
         <li><span class="en">Remaining energy is part of the score, so a treasure is worth its value minus the extra energy it costs.</span><span class="ko">남은 에너지가 점수에 포함되므로, 보물의 순이익은 가치에서 그 보물 때문에 추가로 쓴 에너지를 뺀 값입니다.</span></li>
       </ul>
     </div>

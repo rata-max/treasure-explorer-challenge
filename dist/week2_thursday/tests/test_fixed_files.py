@@ -14,7 +14,7 @@ from pathlib import Path
 EXPECTED = {
     "agent.py": "5a4f94114db5fb154416efb7aeaa1a487ac0b0b83067372dda9d4e5468abe55d",
     "policy_helpers.py": "00e3958aaa591fe1ad74448b8e3e92205304391474d03f832762c046c90ccf7a",
-    "treasure_explorer/engine.py": "2bbdf5c01689aef09c1dab2a9eb6efa363ddb4b848413b3a469c093037a672fb",
+    "treasure_explorer/engine.py": "0356841bc149921de68824f64a4e92bf55543a29bf9a7cfd3936e89dd85e2831",
     "treasure_explorer/runner.py": "c0b916ef97fc5b0891708a9b0a49aa136a79d6478807cbe1b46c4d4503a8a9a7",
 }
 

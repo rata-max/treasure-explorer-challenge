@@ -55,6 +55,7 @@ TODO 2·3을 먼저 하고 싶다면 `False`로 둔 채 진행해도 됩니다. 
 - 도달 불가능하거나 `goal is None` → **`None`** (`[]`와 구분됩니다)
 - 그 외 → 최소 이동 횟수 경로의 `Action` 리스트
 - 벽 `#`, 미지 `?`, `forbidden`의 칸에는 들어가지 않습니다.
+- E를 `bfs_path` 안에서 따로 막을 필요는 없습니다. E를 피해야 하는 호출(보물로 가는 경로)에서는 `route_length`와 제공 orchestration이 E를 `forbidden`에 넣어 줍니다.
 
 구현 순서: `deque` 큐, `parent[다음칸] = (이전칸, 행동)` 딕셔너리, 목표에서 `parent`를 따라 거꾸로 올라가 경로를 복원한 뒤 뒤집기.
 이웃은 `known_neighbors(obs, cell, forbidden)`이 `(다음칸, 행동, 비용)`으로 알려 줍니다.
@@ -69,6 +70,8 @@ TODO 2·3을 먼저 하고 싶다면 `False`로 둔 채 진행해도 됩니다. 
 ### TODO 3 `select_target(obs, state)` — 단일 우회 규칙(필수 수준)
 보물 t마다 `extra = d(현재,t) + 1 + d(t,E) − d(현재,E)`, `gain = 가치 − extra`를 계산합니다.
 `gain`이 가장 큰 양수이고 전체 비용 `d(현재,t) + 1 + d(t,E)`가 에너지 이하인 보물을 고르고, 없으면 출구를 고릅니다.
+**동점 규칙:** `gain`이 같으면 `obs.treasures`에서 먼저 나온 보물(엔진은 위치 순으로 나열)을 유지합니다. 즉 `>`로 비교하고 `>=`를 쓰지 않습니다.
+`two_branches`에서는 시작점에서 두 보물의 `gain`이 7로 같아, 이 규칙대로 경로 위의 T(1,6)를 먼저 고릅니다. 5절의 필수 수준 88점은 이 규칙 기준입니다.
 제공 orchestration이 매 턴 이 함수를 다시 부르므로, 수집 후에는 자동으로 다음 목표를 고릅니다.
 
 **보너스(선택):** 여러 보물의 **방문 순서**까지 고려하면 두 맵의 점수가 오릅니다. 목요일 주제의 예고편입니다.
@@ -78,7 +81,7 @@ TODO 2·3을 먼저 하고 싶다면 `False`로 둔 채 진행해도 됩니다. 
 | 맵 | 배울 점 | 직행(탈출만) | 필수 수준(단일 우회) | 보너스(순서 고려) = 최적 |
 |---|---|---:|---:|---:|
 | `warmup.json` | 경로 위 보물 | 60 | 67 | 67 |
-| `two_branches.json` | 두 갈래 비교 | 76 | 88 | 90 |
+| `two_branches.json` | 두 갈래 비교(시작점에서 gain 동점) | 76 | 88 | 90 |
 | `greedy_trap.json` | 가장 가까운 것이 최선은 아님 | 63 | 78 | 78 |
 | `energy_budget.json` | 출구 에너지 예약 | 66 | 78 | 84 |
 
@@ -95,7 +98,7 @@ python -m unittest discover -s tests -v
 - `test_student_todo`: **여러분의 TODO를 검사합니다. starter에서는 실패하는 것이 정상**입니다.
   - `BfsTests`(5개): 여러분의 `bfs_path`만 검사합니다(참고 BFS는 막힘).
   - `test_submission_uses_my_bfs`: 제출본이 `USE_MY_BFS = True`인지 확인합니다. 실패한 채로 제출하면 20점 감점입니다.
-  - `DecisionTests`, `FullRunTests`: 수집·우회 판단과 4개 맵 완주. `USE_MY_BFS`가 고른 BFS를 쓰므로, BFS를 못 짜도 참고 BFS로 통과할 수 있습니다.
+  - `DecisionTests`, `FullRunTests`: 수집·우회 판단(동점 규칙 포함)과 4개 맵 완주. `USE_MY_BFS`가 고른 BFS를 쓰므로, BFS를 못 짜도 참고 BFS로 통과할 수 있습니다.
 - 테스트 통과는 최소 조건입니다. 점수표와 설계 노트도 채점합니다.
 
 > 게임 점수로는 BFS를 직접 짰는지 구분할 수 없습니다. 참고 BFS도 정확하기 때문입니다. 그래서 BFS 구현은 `BfsTests`와 코드 검토로만 채점합니다.

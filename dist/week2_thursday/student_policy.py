@@ -5,9 +5,12 @@ Edit only the TODO functions (small helper functions are fine).
 Provided : dijkstra_path, route_to, route_cost (never cross E) in policy_helpers
 You write: TODO 1 plan_targets (called once), TODO 2 should_collect
 Required : the EXACT optimum on all 8 maps within 5 s each. Budgets are tight
-           and grand_tour.json has 15 treasures (order search takes ~20 s),
-           so expand only DP states that can still reach E within budget.
-Private  : two unreleased maps with 16-18 treasures, 10 s planning limit.
+           and grand_tour.json has 15 treasures (an order search that only
+           checks the energy spent takes ~20 s), so expand only states that
+           can still reach E within budget.
+Private  : two unreleased maps with 16-18 treasures, budgets as tight as the
+           public large maps (README 4), 10 s planning limit. Practice map:
+           stress/stress_example.json (17 treasures, optimum 444).
 Grading  : exact method 30, optimum 20, time 10, ablation table 20,
            private stress maps 10, design note 10.
 Tests    : tests/test_student_todo.py fails on the starter; make it pass.
@@ -38,9 +41,11 @@ def plan_targets(obs: Observation, state: dict) -> list[Position]:
     - Budgets are tight: the best plan often skips treasures whose single
       detour looks profitable (tight_budget.json, low_value_bait.json).
     - grand_tour.json has 15 treasures and a loose budget: enumerating orders
-      (even with budget pruning) takes minutes. You need subset DP over
-      (visited_set, last) that only expands states still within budget, or a
-      branch-and-bound with a real upper bound.
+      that only checks the energy spent takes ~20 s; also dropping orders that
+      can no longer get back to E brings it to a few seconds, close to the
+      limit. Subset DP over (visited_set, last) that only expands states still
+      within budget, or a branch-and-bound with a real upper bound, stays
+      well under a second.
     Limit: 5 seconds per map (tests/test_student_todo.py measures it).
     """
     return [obs.exit_position]  # starter: go straight out

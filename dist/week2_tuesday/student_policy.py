@@ -3,6 +3,7 @@
 Edit only the TODO functions (small helper functions are fine).
 
 Provided : known_neighbors (with entry cost), bfs_path FOR COMPARISON ONLY
+           (switch COMPARE_WITH_BFS on to fill the README 4 comparison table)
 You write: TODO 1 dijkstra_path -> ([], 0) if there, (None, None) if unreachable
            TODO 2 should_collect, TODO 3 select_target with ENERGY costs
 Terrain  : entering . S E T = 1, mud M = 4, water W = 7; COLLECT = 1.
@@ -15,10 +16,15 @@ Tests    : tests/test_student_todo.py fails on the starter; make it pass.
 """
 
 from treasure_explorer.model import Action, Observation, TreasureInfo
-from policy_helpers import known_neighbors, safe_known_move
+from policy_helpers import bfs_path, known_neighbors, safe_known_move
 
 Position = tuple[int, int]
 COLLECT_COST = 1
+
+# False: every decision and every move uses YOUR dijkstra_path (submit with False).
+# True:  decisions AND movement count steps with the provided bfs_path instead.
+#        This is the "BFS" column of the README 4 comparison table.
+COMPARE_WITH_BFS = False
 
 
 def make_state() -> dict:
@@ -50,10 +56,29 @@ def dijkstra_path(
     raise NotImplementedError("TODO 1: implement Dijkstra with a heap and parents")
 
 
+def find_path(
+    obs: Observation,
+    start: Position,
+    goal: Position | None,
+    forbidden: tuple[Position, ...] = (),
+) -> tuple[list[Action] | None, int | None]:
+    """Provided: your dijkstra_path, or step-count BFS if COMPARE_WITH_BFS is True.
+
+    With the switch on, the returned "cost" is the number of moves: every rule
+    that calls route_cost judges by steps, and the agent also walks the
+    fewest-step route (through mud or water if that is shorter).
+    """
+    if not COMPARE_WITH_BFS:
+        return dijkstra_path(obs, start, goal, forbidden)
+    route = bfs_path(obs, start, goal, forbidden)
+    return (None, None) if route is None else (route, len(route))
+
+
 def route_cost(obs: Observation, start: Position, goal: Position | None) -> int | None:
-    """Provided: energy of the cheapest route that never passes through E."""
+    """Provided: energy of the cheapest route that never passes through E
+    (number of moves instead while COMPARE_WITH_BFS is True)."""
     forbidden = () if goal == obs.exit_position else (obs.exit_position,)
-    return dijkstra_path(obs, start, goal, forbidden)[1]
+    return find_path(obs, start, goal, forbidden)[1]
 
 
 # ======================== STUDENT TODO 2 ========================
@@ -80,5 +105,5 @@ def choose_movement(obs: Observation, state: dict) -> Action:
         state["target"] = select_target(obs, state)
     target = state["target"]
     forbidden = () if target == obs.exit_position else (obs.exit_position,)
-    route, _ = dijkstra_path(obs, obs.position, target, forbidden)
+    route, _ = find_path(obs, obs.position, target, forbidden)
     return route[0] if route else safe_known_move(obs)

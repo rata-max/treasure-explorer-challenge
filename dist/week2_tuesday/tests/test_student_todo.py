@@ -66,9 +66,8 @@ class DijkstraTests(unittest.TestCase):
     def test_water_versus_long_way(self):
         # water costs 7: straight = 7 + 1 = 8, around = 8 moves of cost 1 -> tie broken by cost only
         grid = ("SWE",
-                "#.#",
-                "#.#",
-                "#.#",
+                ".#.",
+                ".#.",
                 "...")
         _, cost = sp.dijkstra_path(obs_for(grid, (0, 0)), (0, 0), (0, 2))
         self.assertEqual(8, cost)
@@ -109,6 +108,12 @@ class DecisionTests(unittest.TestCase):
         grid = ("S.E.T",)
         o = obs_for(grid, (0, 0))
         self.assertIsNone(sp.route_cost(o, (0, 0), (0, 4)))
+
+
+class SubmissionTests(unittest.TestCase):
+    def test_submission_uses_dijkstra(self):
+        self.assertFalse(sp.COMPARE_WITH_BFS,
+                         "COMPARE_WITH_BFS is True: the agent judges and walks by step count (README 5)")
 
 
 class FullRunTests(unittest.TestCase):

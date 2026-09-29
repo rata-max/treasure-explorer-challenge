@@ -47,6 +47,8 @@ def bfs_path(
     - otherwise the list of actions of a minimum-step route
     - never enter a cell in ``forbidden`` (except that ``goal`` itself is never
       forbidden by the caller); walls and ``?`` are never entered
+    - E needs no special case here: callers that must avoid E (routes to a
+      treasure) already pass it in ``forbidden``
 
     Implement BFS with a queue and a ``parent`` dictionary, then walk the
     parents back from ``goal`` to rebuild the route. Use
@@ -98,7 +100,8 @@ def select_target(obs: Observation, state: dict) -> Position | None:
         extra  = total - d(here, E)          # energy spent because of t
         gain   = t.value - extra             # net points for visiting t
     Choose the treasure with the largest positive gain whose ``total`` fits in
-    ``obs.energy``; if none, return ``obs.exit_position``.
+    ``obs.energy``; if none, return ``obs.exit_position``. On equal gain keep
+    the treasure listed first in ``obs.treasures`` (compare with >, not >=).
     ``d`` is ``route_length`` above. It returns None for unreachable cells.
 
     Bonus (not required, previews Thursday): two public maps score higher if

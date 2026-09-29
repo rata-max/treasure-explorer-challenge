@@ -30,6 +30,14 @@ Manhattan distance 1.
 5. Tuning constants on one public map. Use `evaluate.py` with separate tuning and
    reporting seed ranges.
 6. Using `grid[r][c] == "T"` as the collected flag. Use `TreasureInfo.collected`.
+7. Returning to a treasure you already stood on but did not collect (for example
+   because the reserve was too small). It stays an option with its `value` filled
+   in, so a plain "go to the nearest treasure" rule oscillates around it. Judge it
+   again by its revealed value or state when you would go back. (Revealed value-1
+   decoys are removed from the options by the fixed code.)
+8. Ending up with a little energy between mud or water cells. With no affordable
+   move the engine ends the run on the spot (score 0). When energy is low and E is
+   unknown, check that you could step back from a frontier behind costly terrain.
 
 ## The safety margin is a heuristic
 

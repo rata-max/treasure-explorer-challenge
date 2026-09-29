@@ -18,7 +18,7 @@ SMM.E      윗줄 직행: 4번 이동, 4 + 4 + 1 + 1 = 10 에너지
 ## 2. 수정 범위와 제공 코드
 
 - **수정·제출:** `student_policy.py`
-- **제공:** `known_neighbors`(이웃과 진입 비용), 비교용 `bfs_path`(이동 횟수 기준 — **가중치 판단에 쓰면 안 됨**)
+- **제공:** `known_neighbors`(이웃과 진입 비용), 비교용 `bfs_path`(이동 횟수 기준 — **가중치 판단에 쓰면 안 됨**)와 비교 스위치 `COMPARE_WITH_BFS`(4절)
 - **수정 금지:** `agent.py`, `policy_helpers.py`, 엔진, 맵, 테스트
 
 ## 3. TODO
@@ -48,12 +48,19 @@ SMM.E      윗줄 직행: 4번 이동, 4 + 4 + 1 + 1 = 10 에너지
 | `energy_illusion.json` | 이동 횟수로 예산을 재면 에너지가 바닥나 0점. **아무것도 줍지 않는 것이 최적** | 87 | 87 | 87 |
 | `exit_in_the_way.json` | E가 보물 사이에 있음: E를 지나면 즉시 종료 | 65 | 92 | 92 |
 
-BFS(이동 횟수)로 판단하는 정책은 `water_crossing` 81점, `mud_shortcut` 130점, `energy_illusion` 0점을 받습니다.
-설계 노트의 비교표에 여러분의 결과를 적으세요.
+**BFS와 비교하는 방법:** `student_policy.py` 위쪽의 `COMPARE_WITH_BFS`를 `True`로 바꾸고 7개 맵을 다시 실행하세요.
+여러분의 규칙은 그대로 두고 **판단(`route_cost`)과 이동 경로를 모두 이동 횟수(`bfs_path`) 기준**으로 바꿉니다.
+필수 규칙(단일 우회) 기준으로 이 설정에서 `water_crossing` 81점, `mud_shortcut` 130점, `energy_illusion` 0점이 나옵니다.
+`bfs_path`는 경로 리스트만 돌려주므로 `dijkstra_path` 자리에 직접 넣으면 orchestration이 깨집니다. 스위치를 쓰세요.
+비교가 끝나면 **`False`로 되돌려 제출**하세요(`test_submission_uses_dijkstra`가 확인합니다).
+
+설계 노트의 비교표에 두 설정의 결과를 적으세요. 주의할 점: `cycle_detour`에서는 BFS 설정이 110점으로 Dijkstra 필수 규칙(100점)보다 높게 나옵니다.
+BFS가 우회 비용을 과소평가해 두 보물을 모두 노렸는데, 이 맵에서는 둘 다 줍는 것이 실제로 이득이었기 때문입니다(최적 113점).
+BFS가 옳다는 뜻이 아니라 **단일 우회 규칙이 근시안적**이라는 신호입니다. 분석에서 이 차이를 설명해 보세요.
 
 ## 5. 테스트
 
-- `test_student_todo.py`: Dijkstra 계약(위 `SMM.E` 예시 포함), 금지 칸·미지 칸, 진흙을 지나는 우회의 가격, 에너지 기준 예산, E 경유 금지, 7개 맵의 필수 수준 점수. **starter에서는 실패가 정상**입니다.
+- `test_student_todo.py`: Dijkstra 계약(위 `SMM.E` 예시 포함), 금지 칸·미지 칸, 물을 건너는 길과 돌아가는 길의 동점, 진흙을 지나는 우회의 가격, 에너지 기준 예산, E 경유 금지, 제출 스위치(`COMPARE_WITH_BFS = False`), 7개 맵의 필수 수준 점수. **starter에서는 실패가 정상**입니다.
 
 ## 6. 제출물과 채점(100점)
 
@@ -75,7 +82,7 @@ BFS(이동 횟수)로 판단하는 정책은 `water_crossing` 81점, `mud_shortc
 | 20–80분 | TODO 1 Dijkstra, Dijkstra 테스트 통과 |
 | 80–90분 | 휴식 |
 | 90–130분 | TODO 2·3(1주차 코드를 `route_cost`로 교체) |
-| 130–160분 | 7개 맵 실행, `bfs_path`로 바꿔 비교표 작성 |
+| 130–160분 | 7개 맵 실행, `COMPARE_WITH_BFS = True`로 다시 실행해 비교표 작성(제출은 `False`) |
 | 160–180분 | 설계 노트, 제출 점검 |
 
 ```powershell

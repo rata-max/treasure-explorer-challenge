@@ -44,10 +44,14 @@ def _reference_disabled(*_args, **_kwargs):
 class BfsTests(unittest.TestCase):
     """YOUR bfs_path. README 7: contract 4, shortest 8, forbidden 4, unknown 4."""
 
+    # E sits on a dead end below the loop, so no expected route passes through
+    # it: whether bfs_path also avoids E on its own does not change the answers.
     GRID = ("#######",
-            "#S...E#",
+            "#S....#",
             "#.###.#",
             "#.....#",
+            "###.###",
+            "###E###",
             "#######")
 
     def setUp(self):
@@ -135,6 +139,18 @@ class DecisionTests(unittest.TestCase):
         self.assertEqual((1, 5), sp.select_target(o, sp.make_state()))
         o = obs_for(grid, (1, 1), energy=11, treasures=(t,))
         self.assertEqual((4, 3), sp.select_target(o, sp.make_state()))
+
+    def test_equal_gain_keeps_the_first_treasure(self):
+        # README TODO 3: on equal gain keep the treasure listed first in
+        # obs.treasures (compare with >, not >=). Both gains are 4 here:
+        # (1,3) on the path: 2 + 1 + 2 - 4 = 1 extra, value 5 -> gain 4
+        # (3,3) below it:    4 + 1 + 4 - 4 = 5 extra, value 9 -> gain 4
+        # 9 energy fits either detour alone but not both, so a bonus
+        # order search faces the same tie.
+        grid = ("#######", "#S.T.E#", "###.###", "###T###", "#######")
+        near, far = TreasureInfo((1, 3), 5, False), TreasureInfo((3, 3), 9, False)
+        o = obs_for(grid, (1, 1), energy=9, treasures=(near, far))
+        self.assertEqual((1, 3), sp.select_target(o, sp.make_state()))
 
     def test_collected_treasure_is_ignored(self):
         grid = ("#######", "#S...E#", "###.###", "###T###", "#######")
