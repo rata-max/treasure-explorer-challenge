@@ -8,11 +8,8 @@ Required : the EXACT optimum on all 8 maps within 5 s each. Budgets are tight
            and grand_tour.json has 15 treasures (an order search that only
            checks the energy spent takes ~20 s), so expand only states that
            can still reach E within budget.
-Private  : two unreleased maps with 16-18 treasures, budgets as tight as the
-           public large maps (README 4), 10 s planning limit. Practice map:
-           stress/stress_example.json (17 treasures, optimum 444).
-Grading  : exact method 30, optimum 20, time 10, ablation table 20,
-           private stress maps 10, design note 10.
+Grading  : exact method 30, optimum 25, time 10, ablation table 20,
+           design note 15. All 8 maps are public; there are no hidden maps.
 Tests    : tests/test_student_todo.py fails on the starter; make it pass.
 """
 
